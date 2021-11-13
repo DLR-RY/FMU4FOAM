@@ -1,0 +1,30 @@
+
+# binaries
+*.dll
+*.dll.manifest
+*.so
+
+# pythonfmu binaries folder
+/**/pythonfmu/resources/binaries
+
+# CLion
+/**/cmake-build-debug
+/**/cmake-build-release
+
+# Jetbrains tooling
+.idea
+
+#Python
+__pycache__
+.vscode
+*.egg-info
+.pytest_cache
+dist/
+build/
+
+/**/.ipynb_checkpoints
+
+# test and examples artifacts
+/**/*_log.txt
+/**/*_result.mat
+/**/*.fmu
