@@ -16,7 +16,7 @@ class FOAMSlaveInstance : public cppfmu::SlaveInstance
 public:
     FOAMSlaveInstance(std::string instanceName, std::string resources, const cppfmu::Logger& logger, bool visible);
 
-    void initialize(PyGILState_STATE gilState);
+    void initialize(fmi2FMUstate gilState);
 
     void SetupExperiment(cppfmu::FMIBoolean toleranceDefined, cppfmu::FMIReal tolerance, cppfmu::FMIReal tStart, cppfmu::FMIBoolean stopTimeDefined, cppfmu::FMIReal tStop) override;
     void EnterInitializationMode() override;

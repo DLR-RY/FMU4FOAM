@@ -8,7 +8,6 @@ set(headers
         fmi/fmi2TypesPlatform.h
 
         fmu4foam/FOAMSlaveInstance.hpp
-        fmu4foam/PyState.hpp
         )
 
 set(sources
@@ -17,23 +16,23 @@ set(sources
         fmu4foam/FOAMSlaveInstance.cpp
         )
 
-SET (CMAKE_SHARED_LINKER_FLAGS
-     "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,'$ORIGIN'")
+# SET (CMAKE_SHARED_LINKER_FLAGS
+#      "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,'$ORIGIN'")
 
 add_library(fmu4foam-export ${sources} ${headers})
 target_compile_features(fmu4foam-export PUBLIC "cxx_std_17")
 
 target_include_directories(fmu4foam-export
         PRIVATE
-        "${Python3_INCLUDE_DIRS}"
+        "${PUGIXML_INCLUDE_DIRS}"
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
 
 target_link_libraries(fmu4foam-export
         PRIVATE
-        ${Python3_LIBRARIES}
+        ${CONAN_LIBS}
         )
-
+        
 if (WIN32)
   set_target_properties(fmu4foam-export
           PROPERTIES

@@ -1,7 +1,6 @@
 
 #include "fmu4foam/FOAMSlaveInstance.hpp"
 
-#include "fmu4foam/PyState.hpp"
 
 #include "cppfmu/cppfmu_cs.hpp"
 
@@ -10,6 +9,11 @@
 #include <regex>
 #include <sstream>
 #include <utility>
+#include <iostream>
+#include <filesystem>
+namespace fs = std::filesystem;
+
+#include "pugixml.hpp"
 
 namespace fmu4foam
 {
@@ -22,6 +26,29 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     , visible_(visible)
 {
     std::cout << "constructor " << std::endl;
+    std::cout << "instanceName_ " << instanceName_ << std::endl;
+    std::cout << "instanceName_ " << resources_ << std::endl;
+ 
+    
+    auto modelDescription = fs::path(resources_).parent_path() / "modelDescription.xml";
+    for (const auto & entry : fs::directory_iterator(fs::path(resources_).parent_path() ))
+    {
+        std::cout << entry.path() << std::endl;
+    }
+    std::cout << "modelDescription " << modelDescription << std::endl;
+    
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_file(modelDescription.c_str());
+    doc.print(std::cout);
+
+    std::cout << "modelDescription " << result << std::endl;
+    std::cout << "modelDescription " << result.description() << std::endl;
+    std::cout << "modelDescription " << result.description() << std::endl;
+    // std::string path = "/path/to/directory";
+
+    
+    // if (!result)
+    //     return -1;
 }
 
 void FOAMSlaveInstance::clearLogBuffer() const
@@ -31,7 +58,7 @@ void FOAMSlaveInstance::clearLogBuffer() const
     std::cout << "clearLogBuffer " << std::endl;
 }
 
-void FOAMSlaveInstance::initialize(PyGILState_STATE gilState)
+void FOAMSlaveInstance::initialize(fmi2FMUstate gilState)
 {
     std::cout << "initialize " << std::endl;
 }
@@ -139,7 +166,7 @@ void FOAMSlaveInstance::SerializeFMUstate(const fmi2FMUstate& state, fmi2Byte* b
 void FOAMSlaveInstance::DeSerializeFMUstate(const fmi2Byte bytes[], size_t size, fmi2FMUstate& state)
 {
     std::cout << "DeSerializeFMUstate " << std::endl;
-
+}
 
 
 FOAMSlaveInstance::~FOAMSlaveInstance()
@@ -172,10 +199,6 @@ cppfmu::UniquePtr<cppfmu::SlaveInstance> CppfmuInstantiateSlave(
 #else
         resources.replace(find, 7, "");
 #endif
-    }
-
-    if (pyState == nullptr) {
-        pyState = std::make_unique<fmu4foam::PyState>();
     }
 
     return cppfmu::AllocateUnique<fmu4foam::FOAMSlaveInstance>(

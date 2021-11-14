@@ -28,3 +28,9 @@ build/
 /**/*_log.txt
 /**/*_result.mat
 /**/*.fmu
+
+debug/**
+
+#python
+
+env
