@@ -1,6 +1,6 @@
 from pythonfmu.variables import Boolean
 from FMU4FOAM import Fmi2Causality, Fmi2Variability, Real
-from FMU4FOAM.of2fmu import OF2Fmu
+from FMU4FOAM import OF2Fmu
 
 
 class Example(OF2Fmu):

@@ -65,7 +65,16 @@ private:
     {
 
     }
+    
 
+    std::vector<cppfmu::FMIReal> m_real_;
+    std::vector<cppfmu::FMIInteger> m_integer_;
+    std::vector<cppfmu::FMIBoolean> m_boolean_;
+    std::vector<cppfmu::String> m_string_;
+    // cppfmu::FMIReal m_real[];
+    // cppfmu::FMIInteger m_integer[];
+    // cppfmu::FMIBoolean m_boolean[];
+    // cppfmu::String m_string[];
 
 };
 

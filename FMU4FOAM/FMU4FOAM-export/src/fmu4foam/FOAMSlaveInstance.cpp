@@ -24,26 +24,61 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     , resources_(std::move(resources))
     , logger_(logger)
     , visible_(visible)
+    // , m_real_(0)
+    // , m_integer_(0)
+    // , m_boolean_(0)
+    // , m_string_(0)
+
 {
     std::cout << "constructor " << std::endl;
     std::cout << "instanceName_ " << instanceName_ << std::endl;
     std::cout << "instanceName_ " << resources_ << std::endl;
  
     
-    auto modelDescription = fs::path(resources_).parent_path() / "modelDescription.xml";
-    for (const auto & entry : fs::directory_iterator(fs::path(resources_).parent_path() ))
-    {
-        std::cout << entry.path() << std::endl;
-    }
-    std::cout << "modelDescription " << modelDescription << std::endl;
+    auto modelVariables = fs::path(resources_) / "modelVariables.xml";
+    // for (const auto & entry : fs::directory_iterator(fs::path(resources_).parent_path() ))
+    // {
+    //     std::cout << entry.path() << std::endl;
+    // }
     
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file(modelDescription.c_str());
+    pugi::xml_parse_result result = doc.load_file(modelVariables.c_str());
     doc.print(std::cout);
+    std::cout << "modelVariables " << modelVariables << std::endl;
+    std::cout << "try looping "  << std::endl;
+    pugi::xml_node node = doc.child("modelVariables");
 
-    std::cout << "modelDescription " << result << std::endl;
-    std::cout << "modelDescription " << result.description() << std::endl;
-    std::cout << "modelDescription " << result.description() << std::endl;
+    for (pugi::xml_node tool = node.child("ScalarVariable"); node; node = node.next_sibling("ScalarVariable"))
+    {
+        std::cout << "node " << node.attribute("name").value() << "\n";
+    }
+
+    std::cout << "still try looping "  << std::endl;
+    
+    
+    for (pugi::xml_node tool: doc.children())
+    {
+        std::cout << "Tool:";
+
+        for (pugi::xml_node child: tool.children())
+        {
+            std::cout << "child " << child.name() << std::endl;
+            for (pugi::xml_attribute attr: child.attributes())
+            {
+                std::cout << " " << attr.name() << "=" << attr.value() << std::endl;
+                for (pugi::xml_node c2: child.children())
+                {
+                    std::cout << "c2 " << c2.name() << std::endl;
+                }
+            }
+        }
+
+        std::cout << std::endl;
+    }
+
+    std::cout << "modelVariables " << result << std::endl;
+    std::cout << "modelVariables " << result.description() << std::endl;
+    std::cout << "modelVariables " << result.description() << std::endl;
     // std::string path = "/path/to/directory";
 
     
