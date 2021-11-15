@@ -1,6 +1,6 @@
 from ._version import __version__
-from .builder import FmuBuilder
-from .enums import Fmi2Causality, Fmi2Initial, Fmi2Variability
-from .fmi2slave import Fmi2Slave
-from .variables import Boolean, Integer, Real, String
-from .default_experiment import DefaultExperiment
+
+from FMU4FOAM.builder import FmuBuilder
+from FMU4FOAM.fmi2fmu import Fmi2Fmu
+from pythonfmu.enums import Fmi2Causality, Fmi2Initial, Fmi2Variability
+from pythonfmu.variables import Boolean, Integer, Real, String

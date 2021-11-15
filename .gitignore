@@ -4,8 +4,8 @@
 *.dll.manifest
 *.so
 
-# pythonfmu binaries folder
-/**/pythonfmu/resources/binaries
+# FMU4FOAM binaries folder
+/**/FMU4FOAM/resources/binaries
 
 # CLion
 /**/cmake-build-debug
@@ -22,6 +22,7 @@ __pycache__
 dist/
 build/
 
+
 /**/.ipynb_checkpoints
 
 # test and examples artifacts
@@ -34,3 +35,11 @@ debug/**
 #python
 
 env
+
+# c++
+tmp-build
+conanbuildinfo.cmake
+conanbuildinfo.txt
+conaninfo.txt
+conan.lock
+graph_info.json

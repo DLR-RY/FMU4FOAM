@@ -1,11 +1,11 @@
 import argparse
 
-from pythonfmu import builder, csvbuilder, deploy
-from ._version import __version__
-
+# from FMU4FOAM import builder
+from FMU4FOAM._version import __version__
+from FMU4FOAM import builder
 
 def cli_main():
-    parser = argparse.ArgumentParser(prog="pythonfmu")
+    parser = argparse.ArgumentParser(prog="fmu4foam")
 
     parser.add_argument("-V", "--version", action="version", version=__version__)
 
@@ -16,7 +16,7 @@ def cli_main():
     parser.set_defaults(execute=default_execution)
 
     subparsers = parser.add_subparsers(
-        title="Subcommands", description="Call `pythonfmu _command_ -h` to get more help."
+        title="Subcommands", description="Call `fmu4foam _command_ -h` to get more help."
     )
 
     build_parser = subparsers.add_parser(
@@ -26,29 +26,22 @@ def cli_main():
     )
     builder.create_command_parser(build_parser)
 
-    csv_parser = subparsers.add_parser(
-        "buildcsv",
-        description="Build an FMU from a CSV file.",
-        help="Build an FMU from a CSV file."
-    )
-    csvbuilder.create_command_parser(csv_parser)
+    # deploy_parser = subparsers.add_parser(
+    #     "deploy",
+    #     description="""Deploy a Python FMU.
 
-    deploy_parser = subparsers.add_parser(
-        "deploy",
-        description="""Deploy a Python FMU.
+    #     The command will look in the `resources` folder for one of the following files:
+    #     `requirements.txt` or `environment.yml`.
 
-        The command will look in the `resources` folder for one of the following files:
-        `requirements.txt` or `environment.yml`.
+    #     If you specify a environment file but no package manager, `conda` will be selected
+    #     for `.yaml` and `.yml` otherwise `pip` will be used.
 
-        If you specify a environment file but no package manager, `conda` will be selected
-        for `.yaml` and `.yml` otherwise `pip` will be used.
-
-        The tool assume the Python environment in which the FMU should be executed
-        is the current one.
-        """,
-        help="Install Python FMU dependencies."
-    )
-    deploy.create_command_parser(deploy_parser)
+    #     The tool assume the Python environment in which the FMU should be executed
+    #     is the current one.
+    #     """,
+    #     help="Install Python FMU dependencies."
+    # )
+    # deploy.create_command_parser(deploy_parser)
 
     options = vars(parser.parse_args())
     execute = options.pop("execute")

@@ -13,7 +13,8 @@ from typing import Iterable, Optional, Tuple, Union
 from xml.dom.minidom import parseString
 from xml.etree.ElementTree import Element, SubElement, tostring
 from .osutil import get_lib_extension, get_platform
-from .fmi2slave import FMI2_MODEL_OPTIONS, Fmi2Slave
+from .of2fmu import FMI2_MODEL_OPTIONS, OF2Fmu
+
 
 FilePath = Union[str, Path]
 HERE = Path(__file__).parent
@@ -24,7 +25,7 @@ logger = logging.getLogger(__name__)
 def get_class_name(file_name: Path) -> str:
     with open(str(file_name), 'r') as file:
         data = file.read()
-        return re.search(r'class (\w+)\(\s*Fmi2Slave\s*\)\s*:', data).group(1)
+        return re.search(r'class (\w+)\(\s*OF2Fmu\s*\)\s*:', data).group(1)
 
 
 def get_model_description(filepath: Path, module_name: str) -> Tuple[str, Element]:
@@ -50,9 +51,9 @@ def get_model_description(filepath: Path, module_name: str) -> Tuple[str, Elemen
     finally:
         sys.path.remove(str(filepath.parent))  # remove inserted temporary path
 
-    if not isinstance(instance, Fmi2Slave):
+    if not isinstance(instance, OF2Fmu):
         raise TypeError(
-            f"The provided class '{class_name}' does not inherit from {Fmi2Slave.__qualname__}"
+            f"The provided class '{class_name}' does not inherit from {OF2Fmu.__qualname__}"
         )
     # Produce the xml
     return instance.modelName, instance.to_xml()
@@ -89,12 +90,12 @@ class FmuBuilder:
 
         module_name = script_file.stem
 
-        with tempfile.TemporaryDirectory(prefix="pythonfmu_") as tempd:
+        with tempfile.TemporaryDirectory(prefix="FMU4FOAM_") as tempd:
             temp_dir = Path(tempd)
             shutil.copy2(script_file, temp_dir)
 
-            # Embed pythonfmu in the FMU so it does not need to be included
-            dep_folder = temp_dir / "pythonfmu"
+            # Embed FMU4FOAM in the FMU so it does not need to be included
+            dep_folder = temp_dir / "FMU4FOAM"
             dep_folder.mkdir()
             for dep in HERE.glob('*.py'):  # Find all python files at the same level as this one
                 shutil.copy2(dep, dep_folder)
@@ -147,7 +148,7 @@ class FmuBuilder:
                 # Add FMI API wrapping Python class source
                 source_node = SubElement(type_node, "SourceFiles")
                 sources = Path("sources")
-                src = HERE / "pythonfmu-export"
+                src = HERE / "FMU4FOAM-export"
                 for f in itertools.chain(
                     src.rglob("*.hpp"), src.rglob("*.cpp"), src.rglob("CMakeLists.txt")
                 ):
@@ -180,14 +181,14 @@ class FmuBuilder:
                             bfs = bf.readlines()
                             bfs = [line.rstrip() for line in bfs]
                             
-                for f in bfs:
-                    f = Path(f)
-                    arcname = (
-                        binaries
-                        / get_platform()
-                        / f.name
-                    )
-                    zip_fmu.write(f, arcname=arcname)
+                    for f in bfs:
+                        f = Path(f)
+                        arcname = (
+                            binaries
+                            / get_platform()
+                            / f.name
+                        )
+                        zip_fmu.write(f, arcname=arcname)
 
                 # Add the documentation folder
                 if documentation_folder is not None:
