@@ -11,7 +11,7 @@ class fmu4foam(ConanFile):
         cmake.build()
 
     def imports(self):
-        self.copy("*.dll", "", "lib")
+        self.copy("*.dll", "", "bin")
         self.copy("*.dylib", "", "lib")
-        self.copy("*.a", "../../resources/binaries/linux64", "lib")
-        self.copy("*.so", "../../resources/binaries/linux64", "lib")
+        self.copy("*.a", "../resources/binaries/linux64", "lib")
+        self.copy("*.so", "../resources/binaries/linux64", "lib")
