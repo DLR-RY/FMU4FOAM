@@ -16,8 +16,9 @@ set(sources
         fmu4foam/FOAMSlaveInstance.cpp
         )
 
-# SET (CMAKE_SHARED_LINKER_FLAGS
+# set(CMAKE_SHARED_LINKER_FLAGS
 #      "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,'$ORIGIN'")
+
 
 add_library(fmu4foam-export ${sources} ${headers})
 target_compile_features(fmu4foam-export PUBLIC "cxx_std_17")

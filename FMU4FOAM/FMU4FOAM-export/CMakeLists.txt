@@ -7,6 +7,20 @@ project(fmu4foam-export VERSION 0.0.1)
 
 set(BUILD_SHARED_LIBS ON)
 
+# set(CMAKE_SKIP_BUILD_RPATH FALSE)
+
+# # when building, don't use the install RPATH already
+# # (but later on when installing)
+# set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+# set(CMAKE_INSTALL_RPATH "")
+
+# # don't add the automatically determined parts of the RPATH
+# # which point to directories outside the build tree to the install RPATH
+# set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+
+
+set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON) # 
 # ==============================================================================
 # Global internal configuration
 # ==============================================================================
@@ -23,10 +37,13 @@ message("CMAKE_CURRENT_BINARY_DIR is ${CMAKE_CURRENT_BINARY_DIR}")
 
 if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup(NO_OUTPUT_DIRS)
+    conan_basic_setup(NO_OUTPUT_DIRS KEEP_RPATHS)
 else ()
     message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
 endif ()
+
+set(CMAKE_INSTALL_RPATH "$ORIGIN")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
 if (MSVC)
   # https://stackoverflow.com/questions/14172856/compile-with-mt-instead-of-md-using-cmake
