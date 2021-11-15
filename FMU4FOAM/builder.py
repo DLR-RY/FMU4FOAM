@@ -8,12 +8,15 @@ import shutil
 import sys
 import tempfile
 import zipfile
+import copy
 from pathlib import Path
 from typing import Iterable, Optional, Tuple, Union
 from xml.dom.minidom import parseString
-from xml.etree.ElementTree import Element, SubElement, tostring
+from xml.etree.ElementTree import Element, ElementTree, SubElement, tostring
 from .osutil import get_lib_extension, get_platform
 from .of2fmu import FMI2_MODEL_OPTIONS, OF2Fmu
+import os, tarfile
+from io import BytesIO
 
 
 FilePath = Union[str, Path]
@@ -58,12 +61,22 @@ def get_model_description(filepath: Path, module_name: str) -> Tuple[str, Elemen
     # Produce the xml
     return instance.modelName, instance.to_xml()
 
+def get_model_variables(model_xml):
+    var_xml = Element('ModelVariables')
+
+    for c1 in model_xml.iter("ModelVariables"):
+        for c2 in c1.iter("ScalarVariable"):
+            c2_copy = copy.deepcopy(c2)
+            var_xml.append(c2_copy)
+    return var_xml
+
 
 class FmuBuilder:
 
     @staticmethod
     def build_FMU(
         script_file: FilePath,
+        openfoam_case: FilePath,
         dest: FilePath = ".",
         project_files: Iterable[FilePath] = set(),
         documentation_folder: Optional[FilePath] = None,
@@ -87,6 +100,8 @@ class FmuBuilder:
                 raise ValueError(
                     f"The documentation folder does not exists {documentation_folder!s}"
                 )
+
+
 
         module_name = script_file.stem
 
@@ -124,6 +139,7 @@ class FmuBuilder:
                 temp_dir.absolute() / script_file.name, module_name
             )
 
+
             dest_file = dest / f"{model_identifier}.fmu"
 
             type_node = xml.find("CoSimulation")
@@ -132,9 +148,21 @@ class FmuBuilder:
                 if option in option_names:
                     type_node.set(option, str(value).lower())
 
+            # compress openfoam case        
+            of_case = BytesIO()
+            with tarfile.open(fileobj=of_case, mode='w:gz') as archive:
+                dirs = os.listdir(openfoam_case)
+                for f in dirs:
+                    file = os.path.join(openfoam_case,f)
+                    archive.add(file,arcname=f)
+            
+            of_case.seek(0)
+
             with zipfile.ZipFile(dest_file, "w") as zip_fmu:
 
                 resource = Path("resources")
+                # write openfoam  case to zip
+                zip_fmu.writestr(f"resources/{model_identifier}.tar.gz",of_case.getvalue())
 
                 # Add files copied in temporary directory
                 for f in temp_dir.rglob("*"):
@@ -204,6 +232,16 @@ class FmuBuilder:
                     "modelDescription.xml", xml_str.toprettyxml(encoding="UTF-8")
                 )
 
+                # write model vars to resources
+                # print(type(xml))
+                
+
+                var_xml = get_model_variables(xml)
+                var_xml_str = parseString(tostring(var_xml, "UTF-8"))
+                zip_fmu.writestr(
+                    "resources/modelVariables.xml", var_xml_str.toprettyxml(encoding="UTF-8")
+                )
+
             return dest_file
 
     @staticmethod
@@ -221,6 +259,14 @@ def create_command_parser(parser: argparse.ArgumentParser):
         "--file",
         dest="script_file",
         help="Path to the Python script.",
+        required=True
+    )
+
+    parser.add_argument(
+        "-of",
+        "--openfoam-case",
+        dest="openfoam_case",
+        help="Path to OpenFOAM case directory",
         required=True
     )
 
