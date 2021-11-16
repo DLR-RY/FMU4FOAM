@@ -24,11 +24,6 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     , resources_(std::move(resources))
     , logger_(logger)
     , visible_(visible)
-    // , m_real_(0)
-    // , m_integer_(0)
-    // , m_boolean_(0)
-    // , m_string_(0)
-
 {
     std::cout << "constructor " << std::endl;
     std::cout << "instanceName_ " << instanceName_ << std::endl;
@@ -36,26 +31,12 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
  
     
     auto modelVariables = fs::path(resources_) / "modelVariables.xml";
-    // for (const auto & entry : fs::directory_iterator(fs::path(resources_).parent_path() ))
-    // {
-    //     std::cout << entry.path() << std::endl;
-    // }
-    
+        
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(modelVariables.c_str());
     doc.print(std::cout);
-    std::cout << "modelVariables " << modelVariables << std::endl;
-    std::cout << "try looping "  << std::endl;
-    pugi::xml_node node = doc.child("modelVariables");
-
-    for (pugi::xml_node tool = node.child("ScalarVariable"); node; node = node.next_sibling("ScalarVariable"))
-    {
-        std::cout << "node " << node.attribute("name").value() << "\n";
-    }
-
-    std::cout << "still try looping "  << std::endl;
-    
-    
+    std::cout << "modelVariables " << modelVariables
+        
     for (pugi::xml_node tool: doc.children())
     {
         std::cout << "Tool:";
@@ -133,42 +114,66 @@ void FOAMSlaveInstance::Terminate()
 
 void FOAMSlaveInstance::SetReal(const cppfmu::FMIValueReference* vr, std::size_t nvr, const cppfmu::FMIReal* values)
 {
-    std::cout << "SetReal " << std::endl;
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        m_real_[vr[i]] = value[i];
+    }
 }
 
 void FOAMSlaveInstance::SetInteger(const cppfmu::FMIValueReference* vr, std::size_t nvr, const cppfmu::FMIInteger* values)
 {
-    std::cout << "SetInteger " << std::endl;
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        m_integer_[vr[i]] = value[i];
+    }
 }
 
 void FOAMSlaveInstance::SetBoolean(const cppfmu::FMIValueReference* vr, std::size_t nvr, const cppfmu::FMIBoolean* values)
 {
-    std::cout << "SetBoolean " << std::endl;
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        m_boolean_[vr[i]] = value[i];
+    }
 }
 
 void FOAMSlaveInstance::SetString(const cppfmu::FMIValueReference* vr, std::size_t nvr, cppfmu::FMIString const* values)
 {
-    std::cout << "SetString " << std::endl;
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        m_string_[vr[i]] = value[i];
+    }
 }
 
 void FOAMSlaveInstance::GetReal(const cppfmu::FMIValueReference* vr, std::size_t nvr, cppfmu::FMIReal* values) const
 {
-    std::cout << "GetReal " << std::endl;
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        value[i] = m_real_[vr[i]];
+    }
 }
 
 void FOAMSlaveInstance::GetInteger(const cppfmu::FMIValueReference* vr, std::size_t nvr, cppfmu::FMIInteger* values) const
 {
-    std::cout << "GetInteger " << std::endl;
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        value[i] = m_integer_[vr[i]];
+    }
 }
 
 void FOAMSlaveInstance::GetBoolean(const cppfmu::FMIValueReference* vr, std::size_t nvr, cppfmu::FMIBoolean* values) const
 {
-    std::cout << "GetBoolean " << std::endl;
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        value[i] = m_boolean_[vr[i]];
+    }
 }
 
 void FOAMSlaveInstance::GetString(const cppfmu::FMIValueReference* vr, std::size_t nvr, cppfmu::FMIString* values) const
 {
-    std::cout << "GetString " << std::endl;
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        value[i] = m_string_[vr[i]];
+    }
 }
 
 void FOAMSlaveInstance::GetFMUstate(fmi2FMUstate& state)
