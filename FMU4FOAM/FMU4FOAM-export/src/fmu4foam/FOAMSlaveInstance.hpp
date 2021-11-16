@@ -5,8 +5,11 @@
 #include "cppfmu/cppfmu_cs.hpp"
 #include <string>
 #include <vector>
+#include <map>
 
 #include "pugixml.hpp"
+#include <nlohmann/json.hpp>
+#include "zmq_socket.H"
 
 namespace fmu4foam
 {
@@ -57,10 +60,23 @@ private:
     const std::string resources_;
     const cppfmu::Logger& logger_;
 
-    std::vector<cppfmu::FMIReal> m_real_;
-    std::vector<cppfmu::FMIInteger> m_integer_;
-    std::vector<cppfmu::FMIBoolean> m_boolean_;
-    std::vector<cppfmu::String> m_string_;
+    //- map with real values
+    std::map<cppfmu::FMIValueReference,cppfmu::FMIReal> m_real_;
+
+    //- map with integer values
+    std::map<cppfmu::FMIValueReference,cppfmu::FMIInteger> m_integer_;
+
+    //- map with boolean values
+    std::map<cppfmu::FMIValueReference,cppfmu::FMIBoolean> m_boolean_;
+
+    //- map with string values
+    std::map<cppfmu::FMIValueReference,std::string> m_string_;
+
+    //- zmq context
+    zmq::context_t ctx_;
+
+    //- zmq req socket 
+    zmq::socket_t sock_;
 
 
     inline void clearStrBuffer() const

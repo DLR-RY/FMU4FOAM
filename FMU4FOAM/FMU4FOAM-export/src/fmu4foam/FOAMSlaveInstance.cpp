@@ -14,9 +14,9 @@
 #include <filesystem>
 #include <cstring>
 
+
+using json = nlohmann::json;
 namespace fs = std::filesystem;
-
-
 
 namespace fmu4foam
 {
@@ -28,10 +28,12 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     , resources_(std::move(resources))
     , logger_(logger)
     , visible_(visible)
-    , m_real_(0)
-    , m_integer_(0)
-    , m_boolean_(0)
-    // , m_string_(0)
+    , m_real_()
+    , m_integer_()
+    , m_boolean_()
+    , m_string_()
+    , ctx_()
+    , sock_(ctx_, zmq::socket_type::rep)
 {
     std::cout << "constructor " << std::endl;
     std::cout << "instanceName_ " << instanceName_ << std::endl;
@@ -48,19 +50,22 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     init_variables(doc);
 
     // std::cout << "m_real_ " << m_real_ << endl;
-    for (auto r: m_real_)
-    {
-        std::cout << "r " << r << std::endl;
-    }
-    for (auto i: m_integer_)
-    {
-        std::cout << "i " << i << std::endl;
+    for (const auto& [key, value] : m_real_) {
+        std::cout << "r " << key << " = " << value << "; " << std::endl;
     }
 
-    for (auto b: m_boolean_)
-    {
-        std::cout << "b " << b << std::endl;
+    for (const auto& [key, value] : m_integer_) {
+        std::cout << "i " << key << " = " << value << "; " << std::endl;
     }
+
+    for (const auto& [key, value] : m_boolean_) {
+        std::cout << "b " << key << " = " << value << "; " << std::endl;
+    }
+
+    for (const auto& [key, value] : m_string_) {
+        std::cout << "s " << key << " = " << value << "; " << std::endl;
+    }
+
     // std::cout << "m_boolean_ " << m_boolean_ << endl;
     // std::cout << "m_integer_ " << m_integer_ << endl;
     // std::cout << "m_string_ " << m_string_ << endl;
@@ -104,20 +109,23 @@ void FOAMSlaveInstance::init_variables(const pugi::xml_document& doc)
         {
             if (child.child("Real"))
             {
-                m_real_.push_back(0.0);
+                cppfmu::FMIValueReference ref = child.attribute("valueReference").as_uint();
+                m_real_.insert({ref,0.0});
             }
             else if (child.child("Boolean"))
             {
-                m_boolean_.push_back(false);
+                cppfmu::FMIValueReference ref = child.attribute("valueReference").as_uint();
+                m_boolean_.insert({ref,false});
             }
             else if (child.child("Integer"))
             {
-                m_integer_.push_back(0.0);
+                cppfmu::FMIValueReference ref = child.attribute("valueReference").as_uint();
+                m_integer_.insert({ref,0});
             }
             else if (child.child("String"))
             {
-                // cppfmu::String emptyString  = "";
-                // m_string_.push_back(emptyString);
+                cppfmu::FMIValueReference ref = child.attribute("valueReference").as_uint();
+                m_string_.insert({ref,""});
             }
 
             std::cout << "child " << child.name() << std::endl;
@@ -155,6 +163,8 @@ void FOAMSlaveInstance::SetupExperiment(cppfmu::FMIBoolean, cppfmu::FMIReal, cpp
 void FOAMSlaveInstance::EnterInitializationMode()
 {
     std::cout << "SetupExperEnterInitializationModeiment " << std::endl;
+    sock_.bind("tcp://127.0.0.1:8000")
+
 }
 
 void FOAMSlaveInstance::ExitInitializationMode()
@@ -166,19 +176,51 @@ bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal step
 {
     bool status = true;
     std::cout << "DoStep " << std::endl;
-    for (auto r: m_real_)
-    {
-        std::cout << "r " << r << std::endl;
-    }
-    for (auto i: m_integer_)
-    {
-        std::cout << "i " << i << std::endl;
+
+    for (const auto& [key, value] : m_real_) {
+        std::cout << "r " << key << " = " << value << "; " << std::endl;
     }
 
-    for (auto b: m_boolean_)
-    {
-        std::cout << "b " << b << std::endl;
+    for (const auto& [key, value] : m_integer_) {
+        std::cout << "i " << key << " = " << value << "; " << std::endl;
     }
+
+    for (const auto& [key, value] : m_boolean_) {
+        std::cout << "b " << key << " = " << value << "; " << std::endl;
+    }
+
+    for (const auto& [key, value] : m_string_) {
+        std::cout << "s " << key << " = " << value << "; " << std::endl;
+    }
+
+    // receive
+    json_dumped = self.socket_.recv().decode()
+    print(json_dumped)
+    d = json.loads(json_dumped)
+    t = d["t"]
+    print(d)
+    
+    print("current_time",current_time)
+    print("step_size",step_size)
+    self.dTout = d["dTout"]
+    self.Tout = d["Tout"]
+
+    print("self.dTout",self.dTout)
+    print("self.Tout",self.Tout)
+
+    // reply
+    d_in ={  
+        "Qin": self.Qin,
+        "current_time": current_time,
+        "step_size": step_size
+    }
+    print(d_in)
+    
+    json_object = json.dumps(d_in)
+    print(json_object)
+
+    self.socket_.send_string(json_object)
+
 
     return status;
 }
@@ -197,8 +239,10 @@ void FOAMSlaveInstance::SetReal(const cppfmu::FMIValueReference* vr, std::size_t
 {
     for (std::size_t i = 0; i < nvr; ++i)
     {
-        std::cout << "i " << i << " nvr " << nvr << " vr[i] " << vr[i] << " values[i] " << values[i] << std::endl;
-        m_real_[vr[i]] = values[i];
+        if (m_real_.count(vr[i]))
+        {
+            m_real_[vr[i]] = values[i];
+        }
     }
 }
 
@@ -206,8 +250,11 @@ void FOAMSlaveInstance::SetInteger(const cppfmu::FMIValueReference* vr, std::siz
 {
     for (std::size_t i = 0; i < nvr; ++i)
     {
-        std::cout << "i " << i << " nvr " << nvr << " vr[i] " << vr[i] << " values[i] " << values[i] << std::endl;
         m_integer_[vr[i]] = values[i];
+        if (m_integer_.count(vr[i]))
+        {
+            m_integer_[vr[i]] = values[i];
+        }
     }
 }
 
@@ -215,24 +262,29 @@ void FOAMSlaveInstance::SetBoolean(const cppfmu::FMIValueReference* vr, std::siz
 {
     for (std::size_t i = 0; i < nvr; ++i)
     {
-        std::cout << "i " << i << " nvr " << nvr << " vr[i] " << vr[i] << " values[i] " << values[i] << std::endl;
-        m_boolean_[vr[i]] = values[i];
+        if (m_boolean_.count(vr[i]))
+        {
+            m_boolean_[vr[i]] = values[i];
+        }
     }
 }
 
 void FOAMSlaveInstance::SetString(const cppfmu::FMIValueReference* vr, std::size_t nvr, cppfmu::FMIString const* values)
 {
-    // for (std::size_t i = 0; i < nvr; ++i)
-    // {
-    //     m_string_[vr[i]] = values[i];
-    // }
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        if (m_string_.count(vr[i]))
+        {
+            m_string_[vr[i]] = values[i];
+        }
+    }
 }
 
 void FOAMSlaveInstance::GetReal(const cppfmu::FMIValueReference* vr, std::size_t nvr, cppfmu::FMIReal* values) const
 {
     for (std::size_t i = 0; i < nvr; ++i)
     {
-        values[i] = m_real_[vr[i]];
+        values[i] = m_real_.at(vr[i]);
     }
 }
 
@@ -240,7 +292,7 @@ void FOAMSlaveInstance::GetInteger(const cppfmu::FMIValueReference* vr, std::siz
 {
     for (std::size_t i = 0; i < nvr; ++i)
     {
-        values[i] = m_integer_[vr[i]];
+        values[i] = m_integer_.at(vr[i]);
     }
 }
 
@@ -248,16 +300,16 @@ void FOAMSlaveInstance::GetBoolean(const cppfmu::FMIValueReference* vr, std::siz
 {
     for (std::size_t i = 0; i < nvr; ++i)
     {
-        values[i] = m_boolean_[vr[i]];
+        values[i] = m_boolean_.at(vr[i]);
     }
 }
 
 void FOAMSlaveInstance::GetString(const cppfmu::FMIValueReference* vr, std::size_t nvr, cppfmu::FMIString* values) const
 {
-    // for (std::size_t i = 0; i < nvr; ++i)
-    // {
-    //     values[i] = m_string_[vr[i]].c_str();
-    // }
+    for (std::size_t i = 0; i < nvr; ++i)
+    {
+        values[i] = m_string_.at(vr[i]).c_str();
+    }
 }
 
 void FOAMSlaveInstance::GetFMUstate(fmi2FMUstate& state)

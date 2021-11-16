@@ -1,5 +1,5 @@
 from pythonfmu.variables import Boolean
-from FMU4FOAM import Fmi2Causality, Fmi2Variability, Real, Boolean , Integer
+from FMU4FOAM import Fmi2Causality, Fmi2Variability, Real, Boolean , Integer, String
 from FMU4FOAM import OF2Fmu
 
 
@@ -17,6 +17,9 @@ class Example(OF2Fmu):
         self.i_out = 2
         self.b_in = True
         self.b_out = False
+
+        self.s_in = "in"
+        self.s_out = "out"
         
         self.register_variable(Real("r_in", causality=Fmi2Causality.input))
         self.register_variable(Real("r_out", causality=Fmi2Causality.output))
@@ -26,4 +29,7 @@ class Example(OF2Fmu):
 
         self.register_variable(Integer("i_in", causality=Fmi2Causality.input))
         self.register_variable(Integer("i_out", causality=Fmi2Causality.output))
+
+        self.register_variable(String("s_in", causality=Fmi2Causality.input))
+        self.register_variable(String("s_out", causality=Fmi2Causality.output))
 
