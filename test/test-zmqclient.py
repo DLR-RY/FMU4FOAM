@@ -16,7 +16,7 @@ while True:
     socket.send(b"World")
 
     #  Do some 'work'
-    time.sleep(1)
+    time.sleep(0.01)
 
     message = socket.recv()
     print("Received request: %s" % message)

@@ -14,6 +14,13 @@
 namespace fmu4foam
 {
 
+template <class T>
+struct fmuVariable{
+  std::string name;
+  std::string causality; // input output parameter
+  T value;
+};
+
 class FOAMSlaveInstance : public cppfmu::SlaveInstance
 {
 
@@ -61,16 +68,16 @@ private:
     const cppfmu::Logger& logger_;
 
     //- map with real values
-    std::map<cppfmu::FMIValueReference,cppfmu::FMIReal> m_real_;
+    std::map<cppfmu::FMIValueReference,fmuVariable<cppfmu::FMIReal>> m_real_;
 
     //- map with integer values
-    std::map<cppfmu::FMIValueReference,cppfmu::FMIInteger> m_integer_;
+    std::map<cppfmu::FMIValueReference,fmuVariable<cppfmu::FMIInteger>> m_integer_;
 
     //- map with boolean values
-    std::map<cppfmu::FMIValueReference,cppfmu::FMIBoolean> m_boolean_;
+    std::map<cppfmu::FMIValueReference,fmuVariable<cppfmu::FMIBoolean>> m_boolean_;
 
     //- map with string values
-    std::map<cppfmu::FMIValueReference,std::string> m_string_;
+    std::map<cppfmu::FMIValueReference,fmuVariable<std::string>> m_string_;
 
     //- zmq context
     zmq::context_t ctx_;
@@ -91,12 +98,10 @@ private:
 
     void init_variables(const pugi::xml_document& doc);
 
-    std::string read();
+    std::string read_socket();
 
-    void write(std::string w);
+    void write_socket(std::string w);
     
-
-
 };
 
 } // namespace fmu4foam
