@@ -21,7 +21,9 @@ target_compile_features(fmu4foam-export PUBLIC "cxx_std_17")
 
 target_include_directories(fmu4foam-export
         PRIVATE
-        "${PUGIXML_INCLUDE_DIRS}"
+        CONAN_PKG::pugixml
+        CONAN_PKG::nlohmann_json
+        CONAN_PKG::cppzmq
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
 

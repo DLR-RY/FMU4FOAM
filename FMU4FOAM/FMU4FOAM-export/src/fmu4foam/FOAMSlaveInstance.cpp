@@ -163,13 +163,27 @@ void FOAMSlaveInstance::SetupExperiment(cppfmu::FMIBoolean, cppfmu::FMIReal, cpp
 void FOAMSlaveInstance::EnterInitializationMode()
 {
     std::cout << "SetupExperEnterInitializationModeiment " << std::endl;
-    sock_.bind("tcp://127.0.0.1:8000")
+    sock_.bind("tcp://127.0.0.1:8000");
 
 }
 
 void FOAMSlaveInstance::ExitInitializationMode()
 {
     std::cout << "ExitInitializationMode " << std::endl;
+}
+
+std::string FOAMSlaveInstance::read()
+{
+    zmq::message_t z_in;
+    sock_.recv(z_in);
+    std::string read_str = z_in.to_string();
+    return read_str;
+}
+
+void FOAMSlaveInstance::write(std::string w)
+{
+    zmq::message_t z_out(w);
+    sock_.send(z_out,zmq::send_flags::none);
 }
 
 bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal stepSize, cppfmu::FMIBoolean, cppfmu::FMIReal& endOfStep)
@@ -193,33 +207,47 @@ bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal step
         std::cout << "s " << key << " = " << value << "; " << std::endl;
     }
 
+    // re
+    std::string recv = read();
+    std::cout << "recv string: " << recv << std::endl;
+
+
+    std::string send = "HI";
+    std::cout << "send string: " << send << std::endl;
+    write(send);
+    // read section
+    // const auto& regIn = data.getRegistry(commDataLayer::causality::in);
+
+    // Info << "recv " << recv << endl;
+    // json input = json::parse(recv);
+
     // receive
-    json_dumped = self.socket_.recv().decode()
-    print(json_dumped)
-    d = json.loads(json_dumped)
-    t = d["t"]
-    print(d)
+    // json_dumped = self.socket_.recv().decode()
+    // print(json_dumped)
+    // d = json.loads(json_dumped)
+    // t = d["t"]
+    // print(d)
     
-    print("current_time",current_time)
-    print("step_size",step_size)
-    self.dTout = d["dTout"]
-    self.Tout = d["Tout"]
+    // print("current_time",current_time)
+    // print("step_size",step_size)
+    // self.dTout = d["dTout"]
+    // self.Tout = d["Tout"]
 
-    print("self.dTout",self.dTout)
-    print("self.Tout",self.Tout)
+    // print("self.dTout",self.dTout)
+    // print("self.Tout",self.Tout)
 
-    // reply
-    d_in ={  
-        "Qin": self.Qin,
-        "current_time": current_time,
-        "step_size": step_size
-    }
-    print(d_in)
+    // // reply
+    // d_in ={  
+    //     "Qin": self.Qin,
+    //     "current_time": current_time,
+    //     "step_size": step_size
+    // }
+    // print(d_in)
     
-    json_object = json.dumps(d_in)
-    print(json_object)
+    // json_object = json.dumps(d_in)
+    // print(json_object)
 
-    self.socket_.send_string(json_object)
+    // self.socket_.send_string(json_object)
 
 
     return status;

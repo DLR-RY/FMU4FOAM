@@ -9,7 +9,7 @@
 
 #include "pugixml.hpp"
 #include <nlohmann/json.hpp>
-#include "zmq_socket.H"
+#include "zmq_addon.hpp"
 
 namespace fmu4foam
 {
@@ -90,6 +90,10 @@ private:
     }
 
     void init_variables(const pugi::xml_document& doc);
+
+    std::string read();
+
+    void write(std::string w);
     
 
 
