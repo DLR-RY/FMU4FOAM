@@ -197,6 +197,65 @@ bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal step
     bool status = true;
     std::cout << "DoStep " << std::endl;
 
+    
+    // std::cout << j_out.dump(4) << std::endl;
+
+    // re
+    std::string recv = read_socket();
+    std::cout << "recv string: " << recv << std::endl;
+    json j_recv = json::parse(recv);
+
+    for (auto& [key, value] : m_real_) {
+        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
+        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
+        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
+        if (value.causality == "output")
+        {
+            value.value = j_recv[value.name];
+        }
+    }
+
+    for (auto& [key, value] : m_integer_) {
+        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
+        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
+        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
+        if (value.causality == "output")
+        {
+            value.value = j_recv[value.name];
+        }
+    }
+
+    for (auto& [key, value] : m_boolean_) {
+        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
+        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
+        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
+        if (value.causality == "output")
+        {
+            value.value = j_recv[value.name];
+        }
+
+    }
+
+    for (auto& [key, value] : m_string_) {
+        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
+        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
+        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
+        if (value.causality == "output")
+        {
+            value.value = j_recv[value.name];
+        }
+    }
+    // // input.is_number()
+    // for (auto& el : input.items())
+    // {
+    //     std::cout << el.key() << " : " << el.value() << "\n";
+    //     if (input[el.key()].is_number())
+    //     {
+    //         scalar& obj = data.getObj<scalar>(el.key(),commDataLayer::causality::in);
+    //         obj = el.value();
+    //     }
+    // }
+
     json j_out;
 
     for (const auto& [key, value] : m_real_) {
@@ -233,12 +292,6 @@ bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal step
             j_out[value.name] = value.value;
         }
     }
-    // std::cout << j_out.dump(4) << std::endl;
-
-    // re
-    std::string recv = read_socket();
-    std::cout << "recv string: " << recv << std::endl;
-
 
     std::string send = j_out.dump();
     std::cout << "send string: " << send << std::endl;

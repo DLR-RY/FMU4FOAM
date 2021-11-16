@@ -6,6 +6,7 @@
 
 import time
 import zmq
+import json
 
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
@@ -13,7 +14,17 @@ socket.connect("tcp://127.0.0.1:8000")
 
 while True:
     #  Wait for next request from client
-    socket.send(b"World")
+    d_out ={  
+        "r_out": 1.1,
+        "i_out": 7,
+        "b_out": True,
+        "s_out": "send_sucess"
+    }
+    print(d_out)
+    
+    json_object = json.dumps(d_out)
+    print(json_object)
+    socket.send_string(json_object)
 
     #  Do some 'work'
     time.sleep(0.01)
