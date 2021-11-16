@@ -108,26 +108,29 @@ void FOAMSlaveInstance::init_variables(const pugi::xml_document& doc)
         for (pugi::xml_node child: tool.children())
         {
             std::string name = child.attribute("name").as_string();
-            std::string casuality = child.attribute("casuality").as_string();
+            std::string causality = child.attribute("causality").as_string();
             cppfmu::FMIValueReference ref = child.attribute("valueReference").as_uint();
+            std::cout << "name " << name << std::endl;
+            std::cout << "ref " << ref << std::endl;
+            std::cout << "causality " << causality << std::endl;
             if (child.child("Real"))
             {
-                fmuVariable<cppfmu::FMIReal> var = {name,casuality,0.0};
+                fmuVariable<cppfmu::FMIReal> var = {name,causality,0.0};
                 m_real_.insert({ref,var});
             } 
             else if (child.child("Boolean"))
             {
-                fmuVariable<cppfmu::FMIBoolean> var = {name,casuality,false};
+                fmuVariable<cppfmu::FMIBoolean> var = {name,causality,false};
                 m_boolean_.insert({ref,var});
             }
             else if (child.child("Integer"))
             {
-                fmuVariable<cppfmu::FMIInteger> var = {name,casuality,0};
+                fmuVariable<cppfmu::FMIInteger> var = {name,causality,0};
                 m_integer_.insert({ref,var});
             }
             else if (child.child("String"))
             {
-                fmuVariable<std::string> var = {name,casuality,""};
+                fmuVariable<std::string> var = {name,causality,""};
                 m_string_.insert({ref,var});
             }
 
@@ -194,30 +197,50 @@ bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal step
     bool status = true;
     std::cout << "DoStep " << std::endl;
 
-    json
+    json j_out;
 
     for (const auto& [key, value] : m_real_) {
         std::cout << "r " << key << " = " << value.value << "; " << std::endl;
+        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
+        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
+        if (value.causality == "input")
+        {
+            j_out[value.name] = value.value;
+        }
     }
 
     for (const auto& [key, value] : m_integer_) {
         std::cout << "i " << key << " = " << value.value << "; " << std::endl;
+        if (value.causality == "input")
+        {
+            j_out[value.name] = value.value;
+        }
     }
 
     for (const auto& [key, value] : m_boolean_) {
         std::cout << "b " << key << " = " << value.value << "; " << std::endl;
+        if (value.causality == "input")
+        {
+            j_out[value.name] = value.value;
+        }
+
     }
 
     for (const auto& [key, value] : m_string_) {
         std::cout << "s " << key << " = " << value.value << "; " << std::endl;
+        if (value.causality == "input")
+        {
+            j_out[value.name] = value.value;
+        }
     }
+    // std::cout << j_out.dump(4) << std::endl;
 
     // re
     std::string recv = read_socket();
     std::cout << "recv string: " << recv << std::endl;
 
 
-    std::string send = "HI";
+    std::string send = j_out.dump();
     std::cout << "send string: " << send << std::endl;
     write_socket(send);
     // read section
