@@ -3,9 +3,10 @@
 #define fmu4foam_SLAVEINSTANCE_HPP
 
 #include "cppfmu/cppfmu_cs.hpp"
-
 #include <string>
 #include <vector>
+
+#include "pugixml.hpp"
 
 namespace fmu4foam
 {
@@ -45,6 +46,8 @@ public:
 
     void clearLogBuffer() const;
 
+    
+
     ~FOAMSlaveInstance() override;
 
 private:
@@ -54,6 +57,10 @@ private:
     const std::string resources_;
     const cppfmu::Logger& logger_;
 
+    std::vector<cppfmu::FMIReal> m_real_;
+    std::vector<cppfmu::FMIInteger> m_integer_;
+    std::vector<cppfmu::FMIBoolean> m_boolean_;
+    std::vector<cppfmu::String> m_string_;
 
 
     inline void clearStrBuffer() const
@@ -65,12 +72,10 @@ private:
     {
 
     }
+
+    void init_variables(const pugi::xml_document& doc);
     
 
-    std::vector<cppfmu::FMIReal> m_real_;
-    std::vector<cppfmu::FMIInteger> m_integer_;
-    std::vector<cppfmu::FMIBoolean> m_boolean_;
-    std::vector<cppfmu::String> m_string_;
 
 };
 
