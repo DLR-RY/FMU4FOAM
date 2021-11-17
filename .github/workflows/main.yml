@@ -30,10 +30,11 @@ jobs:
         if: startsWith(runner.os, 'Windows')
         run: |
           pip install conan
+          cd $Env:github_workspace/FMU4FOAM/FMU4FOAM-export
           mkdir tmp-build
           conan install . -s build_type=Release --install-folder=tmp-build
           cd tmp-build
-          cmake $Env:github_workspace/FMU4FOAM/FMU4FOAM-export -DCMAKE_BUILD_TYPE=Release -A x64
+          cmake . -DCMAKE_BUILD_TYPE=Release -A x64
           cmake --build . --config Release
           cd ..
 
@@ -41,10 +42,11 @@ jobs:
         if: startsWith(runner.os, 'Linux') || startsWith(runner.os, 'macOS')
         run: |
           pip install conan
+          cd $GITHUB_WORKSPACE/FMU4FOAM/FMU4FOAM-export
           mkdir tmp-build
           conan install . -s build_type=Release -s compiler.libcxx=libstdc++ --install-folder=tmp-build
           cd tmp-build
-          cmake $GITHUB_WORKSPACE/FMU4FOAM/FMU4FOAM-export -DCMAKE_BUILD_TYPE=Release
+          cmake . -DCMAKE_BUILD_TYPE=Release
           cmake --build . --config Release
           cd ..
 
