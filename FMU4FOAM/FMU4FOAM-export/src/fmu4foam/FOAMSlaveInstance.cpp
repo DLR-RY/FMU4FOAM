@@ -306,6 +306,16 @@ void FOAMSlaveInstance::Reset()
 void FOAMSlaveInstance::Terminate()
 {
     std::cout << "Terminate " << std::endl;
+
+    std::string recv = read_socket();
+    std::cout << "recv string: " << recv << std::endl;
+    json j_recv = json::parse(recv);
+
+    json j_out;
+    j_out["terminate"] = true;
+    std::string send = j_out.dump();
+    std::cout << "send string: " << send << std::endl;
+    write_socket(send);
 }
 
 void FOAMSlaveInstance::SetReal(const cppfmu::FMIValueReference* vr, std::size_t nvr, const cppfmu::FMIReal* values)

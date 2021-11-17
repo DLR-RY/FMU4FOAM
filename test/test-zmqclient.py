@@ -32,4 +32,9 @@ while True:
     message = socket.recv()
     print("Received request: %s" % message)
     print("Received request: %s" % message.decode())
+
+    json_dumped = message.decode()
+    d = json.loads(json_dumped)
+    if "terminate" in d:
+        break
     #  Send reply back to client

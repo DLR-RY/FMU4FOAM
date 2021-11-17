@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-2019]
+        os: [ubuntu-20.04] #, windows-latest]
     
     steps:
       - uses: actions/checkout@v2
@@ -86,15 +86,15 @@ jobs:
           path: dist
 
   test:
-    needs: build-python
+    needs: build-test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-2019]
-        python-version: [3.7, 3.8, 3.9]
-        exclude:
-          - os: ubuntu-20.04
-            python-version: 3.7
+        os: [ubuntu-latest]#, windows-latest]
+        python-version: [3.9] #[3.7, 3.8, 3.9]
+        # exclude:
+        #   - os: ubuntu-20.04
+        #     python-version: 3.7
     timeout-minutes: 20
 
     steps:
@@ -118,45 +118,11 @@ jobs:
           conda env update --name=test --file=environment.yml
           cd python-wheel
           python -m pip install FMU4FOAM*.whl
-          python -m pytest --pyargs FMU4FOAM
           cd ..
+          cd test
+          fmu4foam build -f test-example.py -of damBreak/ --no-external-tool
+          python test-omsim.py &
+          python test-zmqclient.py
+
         shell: bash -l {0}
 
-  test-notebook:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache conda packages for Linux
-        if: startsWith(runner.os, 'Linux')
-        uses: actions/cache@v2
-        with:
-          path: /usr/share/miniconda/pkgs
-          key: ${{ runner.os }}-test-nb-cache-conda-pkgs-${{ hashFiles('binder/environment.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-test-nb-cache-conda-pkgs-
-            ${{ runner.os }}-test-nb-
-
-      - name: Setup Python
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-        
-      - name: Run the Tests
-        run: |
-          conda activate test
-          # Install binder dependencies - update binder/environment.yml if they changed
-          cp binder/* .
-          conda env update --name=test --file=environment.yml
-          bash ./postBuild
-          cd ./examples
-          jupyter nbconvert --to notebook --execute demo.ipynb
-          cd ..
-        shell: bash -l {0}
-
-      - name: Archive executed notbook
-        uses: actions/upload-artifact@v2
-        with:
-          name: nb-examples
-          path: examples
