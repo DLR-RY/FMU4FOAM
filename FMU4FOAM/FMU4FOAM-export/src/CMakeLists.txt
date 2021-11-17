@@ -14,6 +14,7 @@ set(sources
         cppfmu/cppfmu_cs.cpp
         cppfmu/fmi_functions.cpp
         fmu4foam/FOAMSlaveInstance.cpp
+        fmu4foam/extract.h
         )
 
 add_library(fmu4foam-export ${sources} ${headers})
@@ -24,6 +25,7 @@ target_include_directories(fmu4foam-export
         CONAN_PKG::pugixml
         CONAN_PKG::nlohmann_json
         CONAN_PKG::cppzmq
+        CONAN_PKG::libarchive
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
 

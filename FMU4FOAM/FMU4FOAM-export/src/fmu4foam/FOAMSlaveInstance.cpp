@@ -13,9 +13,11 @@
 #include <utility>
 #include <filesystem>
 #include <cstring>
+#include "extract.h"
 
 
 using json = nlohmann::json;
+#include <filesystem>
 namespace fs = std::filesystem;
 
 namespace fmu4foam
@@ -41,6 +43,11 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
 
     
     auto modelVariables = fs::path(resources_) / "modelVariables.xml";
+    auto OFCase = fs::path(resources_) / "Example.tar.gz";
+
+    std::cout << "OFCase " << OFCase << std::endl;
+    // ::create_file();
+    ::extract(OFCase.c_str());
         
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(modelVariables.c_str());
@@ -192,15 +199,12 @@ void FOAMSlaveInstance::write_socket(std::string w)
     sock_.send(z_out,zmq::send_flags::none);
 }
 
+
 bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal stepSize, cppfmu::FMIBoolean, cppfmu::FMIReal& endOfStep)
 {
     bool status = true;
     std::cout << "DoStep " << std::endl;
 
-    
-    // std::cout << j_out.dump(4) << std::endl;
-
-    // re
     std::string recv = read_socket();
     std::cout << "recv string: " << recv << std::endl;
     json j_recv = json::parse(recv);
@@ -245,18 +249,12 @@ bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal step
             value.value = j_recv[value.name];
         }
     }
-    // // input.is_number()
-    // for (auto& el : input.items())
-    // {
-    //     std::cout << el.key() << " : " << el.value() << "\n";
-    //     if (input[el.key()].is_number())
-    //     {
-    //         scalar& obj = data.getObj<scalar>(el.key(),commDataLayer::causality::in);
-    //         obj = el.value();
-    //     }
-    // }
+
 
     json j_out;
+
+    j_out["current_time"] = currentTime;
+    j_out["step_size"] = stepSize;
 
     for (const auto& [key, value] : m_real_) {
         std::cout << "r " << key << " = " << value.value << "; " << std::endl;
@@ -296,40 +294,6 @@ bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal step
     std::string send = j_out.dump();
     std::cout << "send string: " << send << std::endl;
     write_socket(send);
-    // read section
-    // const auto& regIn = data.getRegistry(commDataLayer::causality::in);
-
-    // Info << "recv " << recv << endl;
-    // json input = json::parse(recv);
-
-    // receive
-    // json_dumped = self.socket_.recv().decode()
-    // print(json_dumped)
-    // d = json.loads(json_dumped)
-    // t = d["t"]
-    // print(d)
-    
-    // print("current_time",current_time)
-    // print("step_size",step_size)
-    // self.dTout = d["dTout"]
-    // self.Tout = d["Tout"]
-
-    // print("self.dTout",self.dTout)
-    // print("self.Tout",self.Tout)
-
-    // // reply
-    // d_in ={  
-    //     "Qin": self.Qin,
-    //     "current_time": current_time,
-    //     "step_size": step_size
-    // }
-    // print(d_in)
-    
-    // json_object = json.dumps(d_in)
-    // print(json_object)
-
-    // self.socket_.send_string(json_object)
-
 
     return status;
 }
@@ -488,3 +452,5 @@ cppfmu::UniquePtr<cppfmu::SlaveInstance> CppfmuInstantiateSlave(
     return cppfmu::AllocateUnique<fmu4foam::FOAMSlaveInstance>(
         memory, instanceName, resources, logger, visible);
 }
+
+

@@ -101,6 +101,10 @@ private:
     std::string read_socket();
 
     void write_socket(std::string w);
+
+    // void extract(const char *filename);
+
+    // int copy_data(struct archive *ar, struct archive *aw);
     
 };
 
