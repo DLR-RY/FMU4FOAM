@@ -40,7 +40,7 @@ jobs:
       - name: Compile wrapper on Linux / macOS
         if: startsWith(runner.os, 'Linux') || startsWith(runner.os, 'macOS')
         run: |
-        pip install conan
+          pip install conan
           mkdir tmp-build
           conan install . -s build_type=Release -s compiler.libcxx=libstdc++ --install-folder=tmp-build
           cd tmp-build
