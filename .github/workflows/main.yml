@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - '*'
   pull_request:
     branches:
       - '*'
@@ -86,7 +86,7 @@ jobs:
           path: dist
 
   test:
-    needs: build-test
+    needs: build-python
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -116,13 +116,16 @@ jobs:
           conda activate test
           # Install test dependencies - update environment.yml if they changed
           conda env update --name=test --file=environment.yml
+          python -m pip install pyzmq pythonfmu
+          # install wheel
           cd python-wheel
           python -m pip install FMU4FOAM*.whl
           cd ..
+          #run tests
           cd test
           fmu4foam build -f test-example.py -of damBreak/ --no-external-tool
-          python test-omsim.py &
-          python test-zmqclient.py
+          python test-omsim.py > omsim &
+          python test-zmqclient.py > zmq
 
         shell: bash -l {0}
 
