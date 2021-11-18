@@ -44,10 +44,11 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     
     auto modelVariables = fs::path(resources_) / "modelVariables.xml";
     auto OFCase = fs::path(resources_) / "Example.tar.gz";
+    std::string s_ofcase = OFCase.u8string();
 
     std::cout << "OFCase " << OFCase << std::endl;
     // ::create_file();
-    ::extract(OFCase.c_str());
+    ::extract(s_ofcase.c_str());
         
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(modelVariables.c_str());

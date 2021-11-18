@@ -193,11 +193,14 @@ class FmuBuilder:
                     src_binaries.rglob("*.dll"),
                     src_binaries.rglob("*.so"),
                     src_binaries.rglob("*.dylib"),
-                    src_binaries.rglob("*.a")
+                    src_binaries.rglob("*.a"),
+                    src_binaries.rglob("*.lib")
                 ):
                     relative_f = f.relative_to(src_binaries)
-                    if relative_f.stem == "libfmu4foam-export":
+                    if relative_f.stem == "libfmu4foam-export": # linux
                         relative_f = Path(str(relative_f).replace("libfmu4foam-export", model_identifier))
+                    if relative_f.stem == "fmu4foam-export": # windows
+                        relative_f = Path(str(relative_f).replace("fmu4foam-export", model_identifier))
                     arcname = (
                         binaries
                         / relative_f.parent

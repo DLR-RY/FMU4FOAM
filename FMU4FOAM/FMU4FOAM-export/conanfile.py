@@ -1,3 +1,4 @@
+import os
 from conans import ConanFile, CMake, tools
 
 
@@ -11,7 +12,8 @@ class fmu4foam(ConanFile):
         cmake.build()
 
     def imports(self):
-        self.copy("*.dll", "../../resources/binaries/win64", "bin")
-        self.copy("*.dylib", "../../resources/binaries/win64", "lib")
-        self.copy("*.a", "../../resources/binaries/linux64", "lib")
-        self.copy("*.so", "../../resources/binaries/linux64", "lib")
+        
+        self.copy("*.dll", os.path.join('..','..','resources','binaries','win64'), "bin")
+        self.copy("*.lib", os.path.join('..','..','resources','binaries','win64'), "lib")
+        self.copy("*.a", os.path.join('..','..','resources','binaries','linux64'), "lib")
+        self.copy("*.so", os.path.join('..','..','resources','binaries','linux64'), "lib")

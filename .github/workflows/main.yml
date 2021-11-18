@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04] #, windows-latest]
+        os: [ubuntu-20.04, windows-latest]
     
     steps:
       - uses: actions/checkout@v2
@@ -90,7 +90,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]#, windows-latest]
+        os: [ubuntu-latest, windows-latest]
         python-version: [3.9] #[3.7, 3.8, 3.9]
         # exclude:
         #   - os: ubuntu-20.04
@@ -111,7 +111,7 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
         
-      - name: Run the Tests
+      - name: Setup Enviroment
         run: |
           conda activate test
           # Install test dependencies - update environment.yml if they changed
@@ -120,12 +120,22 @@ jobs:
           # install wheel
           cd python-wheel
           python -m pip install FMU4FOAM*.whl
-          cd ..
-          #run tests
+          
+        shell: bash -l {0}
+        
+      - name: run tests
+        run: |
+          conda activate test
           cd test
           fmu4foam build -f test-example.py -of damBreak/ --no-external-tool
           python test-omsim.py > omsim &
           python test-zmqclient.py > zmq
-
+          
         shell: bash -l {0}
+       
+      - name: upload Fmus
+        uses: actions/upload-artifact@v2
+        with:
+          name: fmus
+          path: test/Example.fmu
 

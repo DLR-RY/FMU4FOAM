@@ -55,7 +55,8 @@ static void extract(const char *filename)
         exit(1);
         const char* currentFile = archive_entry_pathname(entry);
         auto fullOutputPath = fs::path("testing") / fs::path(currentFile);
-        archive_entry_set_pathname(entry, fullOutputPath.c_str());
+        std::string s_outpath = fullOutputPath.u8string();
+        archive_entry_set_pathname(entry, s_outpath.c_str());
         r = archive_write_header(ext, entry);
         if (r < ARCHIVE_OK)
         fprintf(stderr, "%s\n", archive_error_string(ext));
