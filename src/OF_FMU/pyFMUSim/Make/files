@@ -1,0 +1,4 @@
+pyFMUSim.C
+FMUSimulator.C
+
+LIB = $(FOAM_USER_LIBBIN)/libpyFMUSim

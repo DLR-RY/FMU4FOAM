@@ -11,6 +11,14 @@ requires conan and pythonfmu
 ```bash
 pip install .
 ```
+### Compile OpenFOAM
+
+```bash
+./build-ECI4FOAM.sh # init submodule
+./Allwmake
+```
+
+
 ### Create FMU
 
 

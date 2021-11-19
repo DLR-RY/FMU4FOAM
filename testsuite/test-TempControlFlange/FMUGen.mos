@@ -1,0 +1,3 @@
+loadModel(Modelica);
+loadFile("./ControlledTemperatureCoupled.mo");
+translateModelFMU(ControlledTemperatureCoupled, version="2.0",fmuType="cs")

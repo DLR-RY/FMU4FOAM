@@ -1,0 +1,3 @@
+[submodule "ECI4FOAM"]
+	path = ECI4FOAM
+	url = https://github.com/HenningScheufler/ECI4FOAM.git
