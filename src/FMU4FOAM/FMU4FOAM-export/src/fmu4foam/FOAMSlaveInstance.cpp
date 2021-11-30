@@ -15,6 +15,9 @@
 #include <cstring>
 #include "extract.h"
 
+#include <fstream> 
+#include <iomanip>
+#include <algorithm>
 
 using json = nlohmann::json;
 #include <filesystem>
@@ -41,14 +44,17 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     std::cout << "instanceName_ " << instanceName_ << std::endl;
     std::cout << "instanceName_ " << resources_ << std::endl;
 
-    
-    auto modelVariables = fs::path(resources_) / "modelVariables.xml";
-    auto OFCase = fs::path(resources_) / "Example.tar.gz";
-    std::string s_ofcase = OFCase.u8string();
 
-    std::cout << "OFCase " << OFCase << std::endl;
-    // ::create_file();
-    ::extract(s_ofcase.c_str(),"Example");
+    printf("os = %s\n", os);
+    printf("os = %s\n", os);
+    printf("os = %s\n", os);
+    printf("os = %s\n", os);
+    printf("os = %s\n", os);
+
+
+    
+    auto modelVariables = fs::path(resources_) / "modelParameters.xml";
+
         
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(modelVariables.c_str());
@@ -56,6 +62,7 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     std::cout << "modelVariables " << modelVariables << std::endl;
 
     init_variables(doc);
+
 
     // std::cout << "m_real_ " << m_real_ << endl;
     for (const auto& [key, value] : m_real_) {
@@ -78,34 +85,34 @@ FOAMSlaveInstance::FOAMSlaveInstance(std::string instanceName, std::string resou
     // std::cout << "m_integer_ " << m_integer_ << endl;
     // std::cout << "m_string_ " << m_string_ << endl;
         
-    for (pugi::xml_node tool: doc.children())
-    {
-        std::cout << "Tool:";
+    // for (pugi::xml_node tool: doc.children())
+    // {
+    //     std::cout << "Tool:";
 
-        for (pugi::xml_node child: tool.children())
-        {
-            std::cout << "child " << child.name() << std::endl;
-            for (pugi::xml_attribute attr: child.attributes())
-            {
-                std::cout << " " << attr.name() << "=" << attr.value() << std::endl;
-                for (pugi::xml_node c2: child.children())
-                {
-                    std::cout << "c2 " << c2.name() << std::endl;
-                }
-            }
-        }
+    //     for (pugi::xml_node child: tool.children())
+    //     {
+    //         std::cout << "child " << child.name() << std::endl;
+    //         for (pugi::xml_attribute attr: child.attributes())
+    //         {
+    //             std::cout << " " << attr.name() << "=" << attr.value() << std::endl;
+    //             for (pugi::xml_node c2: child.children())
+    //             {
+    //                 std::cout << "c2 " << c2.name() << std::endl;
+    //             }
+    //         }
+    //     }
 
-        std::cout << std::endl;
-    }
+    //     std::cout << std::endl;
+    // }
 
     std::cout << "modelVariables " << result << std::endl;
     std::cout << "modelVariables " << result.description() << std::endl;
     std::cout << "modelVariables " << result.description() << std::endl;
     // std::string path = "/path/to/directory";
 
-    
-    // if (!result)
-    //     return -1;
+    // ::create_file();
+ 
+
 }
 
 void FOAMSlaveInstance::init_variables(const pugi::xml_document& doc)
@@ -123,22 +130,30 @@ void FOAMSlaveInstance::init_variables(const pugi::xml_document& doc)
             std::cout << "causality " << causality << std::endl;
             if (child.child("Real"))
             {
-                fmuVariable<cppfmu::FMIReal> var = {name,causality,0.0};
+                const auto& c_real = child.child("Real");
+                cppfmu::FMIReal value = c_real.attribute("start").as_double();
+                fmuVariable<cppfmu::FMIReal> var = {name,causality,value};
                 m_real_.insert({ref,var});
             } 
             else if (child.child("Boolean"))
             {
-                fmuVariable<cppfmu::FMIBoolean> var = {name,causality,false};
+                const auto& c_real = child.child("Boolean");
+                cppfmu::FMIBoolean value = c_real.attribute("start").as_bool();
+                fmuVariable<cppfmu::FMIBoolean> var = {name,causality,value};
                 m_boolean_.insert({ref,var});
             }
             else if (child.child("Integer"))
             {
-                fmuVariable<cppfmu::FMIInteger> var = {name,causality,0};
+                const auto& c_real = child.child("Integer");
+                cppfmu::FMIInteger value = c_real.attribute("start").as_int();
+                fmuVariable<cppfmu::FMIInteger> var = {name,causality,value};
                 m_integer_.insert({ref,var});
             }
             else if (child.child("String"))
             {
-                fmuVariable<std::string> var = {name,causality,""};
+                const auto& c_real = child.child("String");
+                std::string value = c_real.attribute("start").as_string();
+                fmuVariable<std::string> var = {name,causality,value};
                 m_string_.insert({ref,var});
             }
 
@@ -169,15 +184,95 @@ void FOAMSlaveInstance::initialize(fmi2FMUstate gilState)
     std::cout << "initialize " << std::endl;
 }
 
-void FOAMSlaveInstance::SetupExperiment(cppfmu::FMIBoolean, cppfmu::FMIReal, cppfmu::FMIReal startTime, cppfmu::FMIBoolean, cppfmu::FMIReal)
+void FOAMSlaveInstance::SetupExperiment
+(
+    cppfmu::FMIBoolean toleranceDefined,
+    cppfmu::FMIReal tolerance,
+    cppfmu::FMIReal tStart,
+    cppfmu::FMIBoolean stopTimeDefined,
+    cppfmu::FMIReal tStop
+) 
 {
+    //- extract OpenFOAM case
+    std::cout << "toleranceDefined " << toleranceDefined << std::endl;
+    std::cout << "tolerance " << tolerance << std::endl;
+    std::cout << "tStart " << tStart << std::endl;
+    std::cout << "stopTimeDefined " << stopTimeDefined << std::endl;
+    std::cout << "tStop " << tStop << std::endl;
+
+
+    std::cout << "Current path is " << fs::current_path() << std::endl;
+
     std::cout << "SetupExperiment " << std::endl;
+
+    std::string address = "tcp://";
+
+    address += get_by_name(m_string_,"host");
+
+    address.erase(std::remove(address.begin(), address.end(), '\"'), address.end());
+    address += ":" + std::to_string(get_by_name(m_integer_,"port"));
+
+    std::cout << "connecting to  " << address << std::endl;
+
+    sock_.bind(address);
+
+    
+    auto OFCase = fs::path(resources_) / "of_case.tar.gz";
+    std::string s_ofcase = OFCase.u8string();
+
+    std::cout << "OFCase " << OFCase << std::endl;
+    std::string outputPath = get_by_name(m_string_,"outputPath");
+    ::extract(s_ofcase.c_str(), outputPath.c_str());
+
+    json dictMod;
+
+    dictMod["system/controlDict;endTime"] = tStop;
+    add_to_json(dictMod,m_string_,"parameter");
+    add_to_json(dictMod,m_real_,"parameter");
+    add_to_json(dictMod,m_integer_,"parameter");
+    add_to_json(dictMod,m_boolean_,"parameter");
+
+    fs::path caseDir = fs::path(outputPath.c_str()) / fs::path("dictMod.json");
+    std::cout << "caseDir.u8string() "<< caseDir.u8string() << std::endl;
+    std::ofstream o(caseDir.u8string());
+    std::cout << std::setw(4) << dictMod << std::endl;
+    o << std::setw(4) << dictMod << std::endl;
+
+
 }
 
 void FOAMSlaveInstance::EnterInitializationMode()
 {
-    std::cout << "SetupExperEnterInitializationModeiment " << std::endl;
-    sock_.bind("tcp://127.0.0.1:8000");
+
+
+    std::cout << "EnterInitializationMode " << std::endl;
+    // call Allrung
+    std::string outputPath = get_by_name(m_string_,"outputPath");
+    auto allrun_path = fs::path(outputPath.c_str()) / fs::path("Allrun &");
+    std::string allrun = allrun_path.u8string();
+    int res = system(allrun.c_str());
+
+    std::cout << "res " << res << std::endl;
+
+    std::string recv = read_socket();
+    std::cout << "recv string: " << recv << std::endl;
+    json j_recv = json::parse(recv);
+
+    get_from_json(j_recv,m_real_,"output");
+    get_from_json(j_recv,m_integer_,"output");
+    get_from_json(j_recv,m_boolean_,"output");
+    get_from_json(j_recv,m_string_,"output");
+
+    json j_out;
+
+    add_to_json(j_out,m_real_,"input");
+    add_to_json(j_out,m_integer_,"input");
+    add_to_json(j_out,m_boolean_,"input");
+    add_to_json(j_out,m_string_,"input");
+
+    std::string send = j_out.dump();
+    std::cout << "send string: " << send << std::endl;
+    write_socket(send);
 
 }
 
@@ -210,87 +305,21 @@ bool FOAMSlaveInstance::DoStep(cppfmu::FMIReal currentTime, cppfmu::FMIReal step
     std::cout << "recv string: " << recv << std::endl;
     json j_recv = json::parse(recv);
 
-    for (auto& [key, value] : m_real_) {
-        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
-        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
-        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
-        if (value.causality == "output")
-        {
-            value.value = j_recv[value.name];
-        }
-    }
 
-    for (auto& [key, value] : m_integer_) {
-        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
-        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
-        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
-        if (value.causality == "output")
-        {
-            value.value = j_recv[value.name];
-        }
-    }
-
-    for (auto& [key, value] : m_boolean_) {
-        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
-        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
-        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
-        if (value.causality == "output")
-        {
-            value.value = j_recv[value.name];
-        }
-
-    }
-
-    for (auto& [key, value] : m_string_) {
-        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
-        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
-        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
-        if (value.causality == "output")
-        {
-            value.value = j_recv[value.name];
-        }
-    }
-
+    get_from_json(j_recv,m_real_,"output");
+    get_from_json(j_recv,m_integer_,"output");
+    get_from_json(j_recv,m_boolean_,"output");
+    get_from_json(j_recv,m_string_,"output");
 
     json j_out;
 
     j_out["current_time"] = currentTime;
     j_out["step_size"] = stepSize;
 
-    for (const auto& [key, value] : m_real_) {
-        std::cout << "r " << key << " = " << value.value << "; " << std::endl;
-        std::cout << "r " << key << " causality " << value.causality << "; " << std::endl;
-        std::cout << "r " << key << " name " << value.name << "; " << std::endl;
-        if (value.causality == "input")
-        {
-            j_out[value.name] = value.value;
-        }
-    }
-
-    for (const auto& [key, value] : m_integer_) {
-        std::cout << "i " << key << " = " << value.value << "; " << std::endl;
-        if (value.causality == "input")
-        {
-            j_out[value.name] = value.value;
-        }
-    }
-
-    for (const auto& [key, value] : m_boolean_) {
-        std::cout << "b " << key << " = " << value.value << "; " << std::endl;
-        if (value.causality == "input")
-        {
-            j_out[value.name] = value.value;
-        }
-
-    }
-
-    for (const auto& [key, value] : m_string_) {
-        std::cout << "s " << key << " = " << value.value << "; " << std::endl;
-        if (value.causality == "input")
-        {
-            j_out[value.name] = value.value;
-        }
-    }
+    add_to_json(j_out,m_real_,"input");
+    add_to_json(j_out,m_integer_,"input");
+    add_to_json(j_out,m_boolean_,"input");
+    add_to_json(j_out,m_string_,"input");
 
     std::string send = j_out.dump();
     std::cout << "send string: " << send << std::endl;

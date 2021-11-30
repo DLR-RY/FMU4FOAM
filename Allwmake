@@ -4,8 +4,9 @@ export ECI4FOAM_DIR=$(pwd)/ECI4FOAM
 echo "ECI4FOAM_DIR:= $ECI4FOAM_DIR" 
 
 ./src/OF_FMU/pyFMUSim/Allwmake
-# ./src/embeddingPython/Allwmake
+wmake src/OF_FMU/FMU/
 
-# wmake application/test/test-dataLayer
-# wmake application/test/test-json
+
+wmake application/solver/solidFoamAdjustTime/
+wmake application/tools/dictModifier/
 

@@ -6,20 +6,95 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <stdio.h>
 
 #include "pugixml.hpp"
 #include <nlohmann/json.hpp>
 #include "zmq_addon.hpp"
+#include <iostream>
+
+using json = nlohmann::json;
+
 
 namespace fmu4foam
 {
 
+
+#if defined(_WIN32) || defined(_WIN64)
+        const char* os = "Windows";
+#else
+#ifdef __linux
+        const char* os = "Linux";
+#else
+        const char* os = "Unknown";
+#endif
+#endif
+
 template <class T>
 struct fmuVariable{
-  std::string name;
-  std::string causality; // input output parameter
-  T value;
+    std::string name;
+    std::string causality; // input output parameter
+    T value;
 };
+
+
+template <class T>
+void add_to_json
+(
+    json& j,
+    const std::map<cppfmu::FMIValueReference,fmuVariable<T>>& map_var,
+    std::string causality
+)
+{ 
+    if ( !map_var.size() ){
+        return;
+    }
+    for (auto& [key, value] : map_var) {
+        if (value.causality == causality)
+        {
+            j[value.name] = value.value;
+        }
+    }
+
+}
+
+
+template <class T>
+void get_from_json
+(
+    const json& j,
+    std::map<cppfmu::FMIValueReference,fmuVariable<T>>& map_var,
+    std::string causality
+)
+{
+
+    if ( !map_var.size() ){
+        return;
+    }
+    for (auto& [key, value] : map_var) {
+        if (value.causality == causality)
+        {
+            value.value = j[value.name];
+        }
+    }
+}
+
+
+template <class T>
+const T& get_by_name
+(
+    const std::map<cppfmu::FMIValueReference,fmuVariable<T>>& map_var,
+    std::string name
+)
+{
+    for (const auto& [key, value] : map_var) {
+        if (value.name == name)
+        {
+            return value.value;
+        }
+    }
+} 
+
 
 class FOAMSlaveInstance : public cppfmu::SlaveInstance
 {
@@ -29,7 +104,14 @@ public:
 
     void initialize(fmi2FMUstate gilState);
 
-    void SetupExperiment(cppfmu::FMIBoolean toleranceDefined, cppfmu::FMIReal tolerance, cppfmu::FMIReal tStart, cppfmu::FMIBoolean stopTimeDefined, cppfmu::FMIReal tStop) override;
+    void SetupExperiment
+    (
+        cppfmu::FMIBoolean toleranceDefined,
+        cppfmu::FMIReal tolerance,
+        cppfmu::FMIReal tStart,
+        cppfmu::FMIBoolean stopTimeDefined,
+        cppfmu::FMIReal tStop
+    ) override;
     void EnterInitializationMode() override;
     void ExitInitializationMode() override;
     void Terminate() override;
@@ -102,9 +184,6 @@ private:
 
     void write_socket(std::string w);
 
-    // void extract(const char *filename);
-
-    // int copy_data(struct archive *ar, struct archive *aw);
     
 };
 

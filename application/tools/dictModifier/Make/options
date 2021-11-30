@@ -1,0 +1,4 @@
+EXE_INC = \
+    -I../../../ECI4FOAM/src/externalComm/lnInclude \
+
+/* EXE_LIBS = */

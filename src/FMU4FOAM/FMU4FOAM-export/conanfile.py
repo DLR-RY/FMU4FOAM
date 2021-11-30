@@ -10,10 +10,3 @@ class fmu4foam(ConanFile):
         cmake = CMake(self) # it will find the packages by using our auto-generated FindXXX.cmake files
         cmake.configure()
         cmake.build()
-
-    def imports(self):
-        
-        self.copy("*.dll", os.path.join('..','..','resources','binaries','win64'), "bin")
-        self.copy("*.lib", os.path.join('..','..','resources','binaries','win64'), "lib")
-        self.copy("*.a", os.path.join('..','..','resources','binaries','linux64'), "lib")
-        self.copy("*.so", os.path.join('..','..','resources','binaries','linux64'), "lib")

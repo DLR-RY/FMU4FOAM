@@ -1,0 +1,10 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+#------------------------------------------------------------------------------
+
+cp system/externalCouplingDict.bkp system/externalCouplingDict
+cp system/decomposeParDict.bkp system/decomposeParDict
+cp system/controlDict.bkp system/controlDict
+
+rm log.dictModifier
+#------------------------------------------------------------------------------

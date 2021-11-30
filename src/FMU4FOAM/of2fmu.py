@@ -27,7 +27,17 @@ FMI2_MODEL_OPTIONS: List[ModelOptions] = [
 
 
 class OF2Fmu(Fmi2Slave):
-    # """Abstract facade class to execute Python through FMI standard."""
+
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.host = '"127.0.0.1"' #local host aka this computer
+        self.port = 8000
+        self.outputPath = "OFCase"
+        
+        self.register_variable(String("host", causality=Fmi2Causality.parameter, variability=Fmi2Variability.tunable))
+        self.register_variable(Integer("port", causality=Fmi2Causality.parameter, variability=Fmi2Variability.tunable))
+        self.register_variable(String("outputPath", causality=Fmi2Causality.parameter, variability=Fmi2Variability.tunable))
 
 
     def to_xml(self, model_options: Dict[str, str] = dict()) -> Element:

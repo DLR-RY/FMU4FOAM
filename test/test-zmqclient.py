@@ -10,7 +10,7 @@ import json
 
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
-socket.connect("tcp://127.0.0.1:8000")
+socket.connect("tcp://127.0.0.1:6006")
 
 while True:
     #  Wait for next request from client

@@ -27,7 +27,6 @@ build/
 # test and examples artifacts
 /**/*_log.txt
 /**/*_result.mat
-/**/*.fmu
 
 debug/**
 

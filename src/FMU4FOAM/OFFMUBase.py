@@ -34,7 +34,6 @@ class FMUBase(ABC):
         self.oms = oms
 
 
-
     def from_OF(self,dumped_input_json : str):
         ext_inputs = json.loads(dumped_input_json)
         for k in self.coupleData.from_OF:

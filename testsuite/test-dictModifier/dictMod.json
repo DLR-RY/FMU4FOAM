@@ -1,0 +1,6 @@
+{
+    "system/externalCouplingDict;externalFunctions/extSensor/sensorPosition": "( 2 2 2 )",
+    "system/externalCouplingDict;externalFunctions/extPara/function": "constant 20",
+    "system/controlDict;endTime": "10",
+    "system/externalCouplingDict;numberOfSubdomains": "200"
+}

@@ -94,7 +94,7 @@ jobs:
         # exclude:
         #   - os: ubuntu-20.04
         #     python-version: 3.7
-    timeout-minutes: 20
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v2
@@ -142,17 +142,30 @@ jobs:
   build-and-test:
     needs: build-python
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+
 
     steps:
     - uses: actions/checkout@v2
+      with:
+          submodules: recursive
+    - name: Setup Python 39
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+          auto-update-conda: true
+          python-version: 3.9
+          
     - name: setup  openfoam
       run: |
         curl -s https://dl.openfoam.com/add-debian-repo.sh | sudo bash
         wget -q -O - https://dl.openfoam.com/add-debian-repo.sh | sudo bash
         sudo apt-get install openfoam2106-default
     - name: compile
+      shell: bash -l {0}
       run: |
         # setup
+        conda activate test
         export WM_NCOMPPROCS=2
         python -m pip install --upgrade pip
         pip install oftest conan
@@ -167,7 +180,75 @@ jobs:
         name: python-wheel
 
     - name: test
+      shell: bash -l {0}
       run: |
+        conda activate test
+        # Install test dependencies - update environment.yml if they changed
+        conda env update --name=test --file=environment.yml
+        pip install oftest OMSimulator pythonfmu
+        cd python-wheel
+        pip install FMU4FOAM*.whl
+        cd ..
+        openfoam2106 -c "py.test -v --tb=auto"
+        
+
+  build-and-test-wsl:
+    needs: build-python
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: setup  wsl
+      uses: Vampire/setup-wsl@v1.1.0
+      with:
+          distribution: Ubuntu-20.04
+          
+    - name: setup  openfoam
+      shell: wsl-bash_Ubuntu-20.04 {0}
+      run: |
+        echo $PWD
+        sudo apt-get update
+        sudo apt-get install -y dos2unix ca-certificates cmake
+        sudo find . -type f -exec dos2unix {} \;
+        curl -s https://dl.openfoam.com/add-debian-repo.sh | sudo bash
+        wget -q -O - https://dl.openfoam.com/add-debian-repo.sh | sudo bash
+        sudo apt-get install -y openfoam2106-default
+        sudo apt-get install -y libatlas-base-dev
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+        bash ~/miniconda.sh -b -p $HOME/miniconda
+        export PATH="$HOME/miniconda/bin:$PATH"
+        
+        
+    - name: compile
+      shell: wsl-bash_Ubuntu-20.04 {0}
+      run: |
+        # setup
+        find . -name Allwmake -exec echo chmod u+x {} \; 
+        find . -name Allrun -exec echo chmod u+x {} \; 
+        find . -name *.sh -exec echo chmod u+x {} \; 
+        export PATH="$HOME/miniconda/bin:$PATH"
+        export WM_NCOMPPROCS=2
+
+        python -m pip install --upgrade pip
+        pip install oftest conan 
+        openfoam2106 -c ./build-ECI4FOAM.sh
+
+        # compile OpenFOAM
+        openfoam2106 -c ./Allwmake
+
+    - name: Download python package
+      uses: actions/download-artifact@v1
+      with:
+        name: python-wheel
+
+    - name: test
+      shell: wsl-bash_Ubuntu-20.04 {0}
+      run: |
+        export PATH="$HOME/miniconda/bin:$PATH"
+        conda install -c conda-forge pyfmi
         pip install oftest OMSimulator pythonfmu
         cd python-wheel
         pip install FMU4FOAM*.whl

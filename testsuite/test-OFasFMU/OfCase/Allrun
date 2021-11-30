@@ -1,0 +1,17 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
+
+touch flange.foam
+
+runApplication dictModifier dictMod.json
+
+runApplication ansysToFoam \
+    ${FOAM_TUTORIALS:?}/resources/geometry/flange.ans -scale 0.001
+
+runApplication $(getApplication)
+
+
+
+#------------------------------------------------------------------------------

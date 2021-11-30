@@ -62,6 +62,8 @@ def get_model_description(filepath: Path, module_name: str) -> Tuple[str, Elemen
     return instance.modelName, instance.to_xml()
 
 def get_model_variables(model_xml):
+    
+    var_xml = Element('modelParameters')
     var_xml = Element('ModelVariables')
 
     for c1 in model_xml.iter("ModelVariables"):
@@ -162,7 +164,7 @@ class FmuBuilder:
 
                 resource = Path("resources")
                 # write openfoam  case to zip
-                zip_fmu.writestr(f"resources/{model_identifier}.tar.gz",of_case.getvalue())
+                zip_fmu.writestr("resources/of_case.tar.gz",of_case.getvalue())
 
                 # Add files copied in temporary directory
                 for f in temp_dir.rglob("*"):
@@ -245,7 +247,7 @@ class FmuBuilder:
                 var_xml = get_model_variables(xml)
                 var_xml_str = parseString(tostring(var_xml, "UTF-8"))
                 zip_fmu.writestr(
-                    "resources/modelVariables.xml", var_xml_str.toprettyxml(encoding="UTF-8")
+                    "resources/modelParameters.xml", var_xml_str.toprettyxml(encoding="UTF-8")
                 )
 
             return dest_file
