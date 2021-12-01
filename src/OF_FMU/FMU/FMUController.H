@@ -26,10 +26,28 @@ Group
     grpUtilitiesFunctionObjects
 
 Description
-
+    connects to the FMU instance and is responsible for the communication
 
 Usage
+    add to system/controlDict.functions
+    also the dictionary include the dictionary simulationParameters
+    at the top of system controlDict
+    #include       "simulationParameters"
 
+    \verbatim
+    in system/controlDict.functions
+    FMUController
+    {
+        type            FMUController;
+        libs            (FMUController);
+        host            $host;
+        port            $port;
+    }
+    in system/simulationParameters (can be changed by the FMU)
+    host            "127.0.0.1";
+    port            8000;
+
+    \endverbatim
 
 Note
 
@@ -66,17 +84,22 @@ class FMUController
 :
     public functionObject
 {
-protected:
+private:
 
     // Private data
     zmq_socket sock_;
 
     const Time& time_;
 
+    scalar targetTime_; 
+
     externalIOObjectList extIOList_;
 
 
-    // Protected Member Functions
+    // Private Member Functions
+
+        template<class T>
+        void sync_regObjects(objectRegistry& obj);
 
         //- No copy construct
         FMUController(const FMUController&) = delete;

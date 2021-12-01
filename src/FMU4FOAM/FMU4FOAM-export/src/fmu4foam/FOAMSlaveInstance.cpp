@@ -265,6 +265,8 @@ void FOAMSlaveInstance::EnterInitializationMode()
 
     json j_out;
 
+    j_out["current_time"] = 0.0;
+    j_out["step_size"] = 0.0;
     add_to_json(j_out,m_real_,"input");
     add_to_json(j_out,m_integer_,"input");
     add_to_json(j_out,m_boolean_,"input");

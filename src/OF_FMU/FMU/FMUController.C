@@ -25,7 +25,7 @@ License
 #include "commDataLayer.H"
 #include <nlohmann/json.hpp>
 #include "registeredObject.H"
-#include "json.H"
+#include "FMU_json.H"
 
 using json = nlohmann::json;
 
@@ -46,6 +46,25 @@ namespace functionObjects
 }
 }
 
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+template<class T>
+void Foam::functionObjects::FMUController::sync_regObjects(objectRegistry& obj)
+{
+    forAllIters(obj, iter)
+    {
+        regIOobject* obj = iter.val();
+        if (isType<registeredObject<T>>(*obj))
+        {
+            registeredObject<T>& regObj =
+                refCast<registeredObject<T> > (*obj);
+
+            Pstream::scatter(regObj.ref());
+
+        }
+    }
+}
+
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
@@ -62,9 +81,10 @@ Foam::functionObjects::FMUController::FMUController
     functionObject(name),
     sock_(dict),
     time_(runTime),
+    targetTime_(-GREAT),
     extIOList_(runTime)
 {
-    Info << "Foam::functionObjects::FMUController::FMUController  " << endl;
+    Pout << "Foam::functionObjects::FMUController::FMUController  " << endl;
     read(dict);
     commDataLayer& data = commDataLayer::New(time_);
     data.storeObj(scalar(0.0),"step_size",commDataLayer::causality::in);
@@ -76,49 +96,39 @@ Foam::functionObjects::FMUController::FMUController
         f.execute();
     }
 
-    // sync vars 
-    const auto& regOut = data.getRegistry(commDataLayer::causality::out);
-    json jOutput;
-    forAllConstIters(regOut, iter)
+    if (Pstream::master())
     {
-        const regIOobject* obj = iter.val();
-        if (isType<registeredObject<scalar>>(*obj))
-        {
-            const registeredObject<scalar>& regScalar =
-                refCast<const registeredObject<scalar> > (*obj);
+        // send
+        const auto& regOut = data.getRegistry(commDataLayer::causality::out);
+        json jOutput;
+        jOutput["t"]  = time_.value();
+        jOutput["dt"] = time_.deltaTValue();
 
-            add_to_json(jOutput,regScalar);
+        // build output json
+        add_to_json<scalar>(jOutput,regOut);
+        add_to_json<vector>(jOutput,regOut);
 
-        }
-        if (isType<registeredObject<vector>>(*obj))
-        {
+        Info << "jOutput " << word(jOutput.dump()) << endl;
+        sock_.write(word(jOutput.dump()));
+        
+        // receive
+        auto& regIn = data.getRegistry(commDataLayer::causality::in);
 
-            const registeredObject<vector>& regVector =
-                refCast<const registeredObject<vector> > (*obj);
+        word recv = sock_.read();
+        Info << "recv json " << recv << endl;
+        json input = json::parse(recv);
 
-            add_to_json(jOutput,regVector);
-        }
+        // update input data
+        get_from_json<scalar>(input,regIn);
+        get_from_json<vector>(input,regIn);
+
     }
 
-    Info << "j dumped " << word(jOutput.dump()) << endl;
-    sock_.write(word(jOutput.dump()));
-    // read section
-    const auto& regIn = data.getRegistry(commDataLayer::causality::in);
+    auto& regIn = data.getRegistry(commDataLayer::causality::in);
 
-    word recv = sock_.read();
-    Info << "recv " << recv << endl;
-    json input = json::parse(recv);
-
-    // input.is_number()
-    for (auto& el : input.items())
-    {
-        std::cout << el.key() << " : " << el.value() << "\n";
-        if (input[el.key()].is_number())
-        {
-            scalar& obj = data.getObj<scalar>(el.key(),commDataLayer::causality::in);
-            obj = el.value();
-        }
-    }
+    sync_regObjects<scalar>(regIn);
+    sync_regObjects<vector>(regIn);
+    Pout << "end constructor " << endl;
 }
 
 
@@ -134,38 +144,50 @@ bool Foam::functionObjects::FMUController::read(const dictionary& dict)
 
 bool Foam::functionObjects::FMUController::adjustTimeStep()
 {
-    Info << "adjustTimeStep " << endl;
-    Info << "time_.timeIndex() " << time_.timeIndex() << endl;
-    commDataLayer& data = commDataLayer::New(time_);
-    scalar currentTime = data.getObj<scalar>("current_time",commDataLayer::causality::in);
-    scalar step_size = data.getObj<scalar>("step_size",commDataLayer::causality::in);
+    // Info << "adjustTimeStep " << endl;
+    // Info << "time_.timeIndex() " << time_.timeIndex() << endl;
+    // commDataLayer& data = commDataLayer::New(time_);
+    // scalar currentTime = data.getObj<scalar>("current_time",commDataLayer::causality::in);
+    // scalar step_size = data.getObj<scalar>("step_size",commDataLayer::causality::in);
 
-     // sync times
-    scalar newDeltaT = time_.deltaTValue();
-    if (time_.timeIndex() > 0)
-    {
-        newDeltaT = currentTime + step_size - time_.value();
-    }
-    Info << "target time value " << currentTime + step_size  << " : "  << time_.value() + newDeltaT << endl;
+    // Info << "target time value " << targetTime_  << " currentTime: "  << time_.value() << endl;
+    // Info << "target currentTime value " << currentTime  << " step_size: "  << step_size << endl;
 
-    static label index = -1;
+    // if (targetTime_ >= time_.value() + time_.deltaTValue())
+    // {
+    //     return true;
+    // }
 
-    if (time_.timeIndex() != index)
-    {
-        // Store current time so we don't get infinite recursion (since
-        // setDeltaT calls adjustTimeStep() again)
-        index = time_.timeIndex();
+    // Info << "proceed currentTime value " << currentTime  << " step_size: "  << step_size << endl;
 
-        // Set time, allow deltaT to be adjusted for writeInterval purposes
-        const_cast<Time&>(time_).setDeltaT(newDeltaT, false);
-        Info << "newDeltaT is " << newDeltaT << endl;
-    }
+
+    //  // sync times
+    // scalar newDeltaT = time_.deltaTValue();
+    // if (time_.timeIndex() > 0)
+    // {
+    //     newDeltaT = currentTime + step_size - time_.value();
+    // }
+    // Info << "target time value " << currentTime + step_size  << " : "  << time_.value() + newDeltaT << endl;
+
+    // static label index = -1;
+
+    // if (time_.timeIndex() != index)
+    // {
+    //     // Store current time so we don't get infinite recursion (since
+    //     // setDeltaT calls adjustTimeStep() again)
+    //     index = time_.timeIndex();
+
+    //     // Set time, allow deltaT to be adjusted for writeInterval purposes
+    //     const_cast<Time&>(time_).setDeltaT(newDeltaT, false);
+    //     Info << "newDeltaT is " << newDeltaT << endl;
+    // }
 
     return true;
 }
 
 bool Foam::functionObjects::FMUController::execute()
 {
+    Pout << "Foam::functionObjects::FMUController::execute() " << endl;
     auto& extFunc = extIOList_.functions();
     for(auto& f: extFunc)
     {
@@ -176,52 +198,48 @@ bool Foam::functionObjects::FMUController::execute()
 
     scalar currentTime = data.getObj<scalar>("current_time",commDataLayer::causality::in);
     scalar step_size = data.getObj<scalar>("step_size",commDataLayer::causality::in);
-    Info << "target time value " << currentTime + step_size  << " currentTime: "  << time_.value() << endl;
+    Info << "target time value " << targetTime_  << " currentTime: "  << time_.value() << " time_.deltaTValue() " << time_.deltaTValue() << endl;
+    Info << "target currentTime value " << currentTime  << " step_size: "  << step_size << endl;
 
-    const auto& regOut = data.getRegistry(commDataLayer::causality::out);
-    json jOutput;
-    jOutput["t"]  = time_.value();
-    jOutput["dt"] = time_.deltaTValue();
-    forAllConstIters(regOut, iter)
+    targetTime_ = currentTime + step_size;
+    if (targetTime_ >= time_.value() + time_.deltaTValue())
     {
-        const regIOobject* obj = iter.val();
-        if (isType<registeredObject<scalar>>(*obj))
-        {
-            const registeredObject<scalar>& regScalar =
-                refCast<const registeredObject<scalar> > (*obj);
-
-            add_to_json(jOutput,regScalar);
-
-        }
-        if (isType<registeredObject<vector>>(*obj))
-        {
-
-            const registeredObject<vector>& regVector =
-                refCast<const registeredObject<vector> > (*obj);
-
-            add_to_json(jOutput,regVector);
-        }
+        return true;
     }
 
-    Info << "j dumped " << word(jOutput.dump()) << endl;
-    sock_.write(word(jOutput.dump()));
-    // read section
-    const auto& regIn = data.getRegistry(commDataLayer::causality::in);
-
-    word recv = sock_.read();
-    Info << "recv " << recv << endl;
-    json input = json::parse(recv);
-
-    // input.is_number()
-    for (auto& el : input.items())
+    Info << "communicate data" << endl;
+    if (Pstream::master())
     {
-        std::cout << el.key() << " : " << el.value() << "\n";
-        if (input[el.key()].is_number())
-        {
-            scalar& obj = data.getObj<scalar>(el.key(),commDataLayer::causality::in);
-            obj = el.value();
-        }
+        // send
+        const auto& regOut = data.getRegistry(commDataLayer::causality::out);
+        json jOutput;
+        jOutput["t"]  = time_.value();
+        jOutput["dt"] = time_.deltaTValue();
+
+        // build output json
+        add_to_json<scalar>(jOutput,regOut);
+        add_to_json<vector>(jOutput,regOut);
+
+        Info << "jOutput " << word(jOutput.dump()) << endl;
+        sock_.write(word(jOutput.dump()));
+        
+        // receive
+        auto& regIn = data.getRegistry(commDataLayer::causality::in);
+
+        word recv = sock_.read();
+        Info << "recv json " << recv << endl;
+        json input = json::parse(recv);
+
+        // update input data
+        get_from_json<scalar>(input,regIn);
+        get_from_json<vector>(input,regIn);
+
     }
+
+    auto& regIn = data.getRegistry(commDataLayer::causality::in);
+
+    sync_regObjects<scalar>(regIn);
+    sync_regObjects<vector>(regIn);
 
     return true;
 }
