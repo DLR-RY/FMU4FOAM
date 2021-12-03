@@ -205,11 +205,11 @@ void FOAMSlaveInstance::SetupExperiment
 
     std::cout << "SetupExperiment " << std::endl;
 
-    std::string address = "tcp://";
+    std::string address = "tcp://*";
 
-    address += get_by_name(m_string_,"host");
+    // address += get_by_name(m_string_,"host");
 
-    address.erase(std::remove(address.begin(), address.end(), '\"'), address.end());
+    // address.erase(std::remove(address.begin(), address.end(), '\"'), address.end());
     address += ":" + std::to_string(get_by_name(m_integer_,"port"));
 
     std::cout << "connecting to  " << address << std::endl;
@@ -243,13 +243,14 @@ void FOAMSlaveInstance::SetupExperiment
 
 void FOAMSlaveInstance::EnterInitializationMode()
 {
-
-
     std::cout << "EnterInitializationMode " << std::endl;
     // call Allrung
     std::string outputPath = get_by_name(m_string_,"outputPath");
-    auto allrun_path = fs::path(outputPath.c_str()) / fs::path("Allrun &");
-    std::string allrun = allrun_path.u8string();
+    std::string oscmd = get_by_name(m_string_,"oscmd");
+    std::string arguments = get_by_name(m_string_,"arguments");
+    std::string allrun_path = (fs::path(outputPath.c_str()) / fs::path("Allrun")).generic_string();
+    std::string allrun = oscmd + " " + allrun_path + " " + arguments + " &";
+    std::cout << "running  " << allrun << std::endl;
     int res = system(allrun.c_str());
 
     std::cout << "res " << res << std::endl;
