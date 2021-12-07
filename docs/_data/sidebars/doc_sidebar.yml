@@ -53,6 +53,17 @@ entries:
       url: /doc_architecture.html
       output: web, pdf
 
+  - title: Examples
+    output: web, pdf
+    folderitems:
+
+    - title: Heated Room
+      url: /doc_heatedRoom.html
+      output: web, pdf
+
+    - title: Fuel Truck
+      url: /doc_fuelTruck.html
+      output: web, pdf
 
   - title: Release Notes
     output: web, pdf
