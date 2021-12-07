@@ -6,17 +6,42 @@ permalink: index.html
 summary: FMU4FOAM with testsuite and documenation
 ---
 
+# FMU4FOAM
+
+
+### Install library OpenFOAM
+
+```bash
+pip install oftest conan
+./build-ECI4FOAM.sh # init submodules
+./Allwmake
+```
+
+### run example FMU
+
+
+requires that OpenFOAM is build on that machine
+
+```bash
+cd example/TempControlFlange
+./Allrun
+```
+
+```bash
+python test-omsim.py > log
+```
+
+
 FMU4FOAM to quickly generate a library with testsuite and hosted documenation
 
 zip or clone this library and edit it from there
 
 ## Installation OpenFOAM
 
-requires OpenFOAM of2012 sourced and installed
+```bash
+pip install fmu4foam
+```
 
-```
-./Allwmake
-```
 ## Installation Testsuite
 
 install oftest to automatically test OpenFOAM with py.test
@@ -32,6 +57,3 @@ py.test
 
 {% include links.html %}
 
-
-
-{% include links.html %}
