@@ -1,0 +1,3 @@
+loadModel(Modelica);
+loadFile("./FuelTruck.mo");
+translateModelFMU(FuelTruck, version="2.0",fmuType="cs")

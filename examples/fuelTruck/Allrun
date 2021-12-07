@@ -1,0 +1,20 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
+
+restore0Dir
+
+touch fuelTruck.foam
+
+# m4 system/blockMeshDict.m4 > system/blockMeshDict
+runApplication blockMesh
+runApplication -s 1 transformPoints -scale 10
+runApplication -s 2 transformPoints -rollPitchYaw '(0 90 0)'
+
+
+runApplication setFields
+
+runApplication $(getApplication)
+
+#------------------------------------------------------------------------------
