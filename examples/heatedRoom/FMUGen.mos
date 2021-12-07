@@ -1,0 +1,3 @@
+loadModel(Modelica);
+loadFile("./HVACSystem.mo");
+translateModelFMU(HVACSystem, version="2.0",fmuType="cs")

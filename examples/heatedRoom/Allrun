@@ -1,0 +1,20 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
+touch heatRoom.foam
+
+
+runApplication blockMesh
+# runApplication refineMesh -overwrite
+
+runApplication topoSet 
+
+# create the inlet/outlet and AMI patches
+runApplication createPatch -overwrite
+# runApplication -s 1 refineMesh -overwrite
+restore0Dir
+
+runApplication $(getApplication)
+
+#------------------------------------------------------------------------------

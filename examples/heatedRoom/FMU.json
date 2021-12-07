@@ -1,0 +1,10 @@
+{
+    "mapping": [["TempSens","model.root.system1.Tin"],
+                ["Toutlet","model.root.system1.Tinlet"],
+                ["Tin","model.root.system1.Tout"],
+                ["mdotin","model.root.system1.mout"]],
+    "from_OF": {"TempSens":"REAL",
+                "Toutlet":"REAL"},
+    "to_OF":   {"Tin":"REAL",
+                "mdotin":"REAL"}
+}
