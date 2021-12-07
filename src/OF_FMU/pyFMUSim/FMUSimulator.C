@@ -23,9 +23,8 @@ License
 #include "foamVersion.H"
 #include "addToRunTimeSelectionTable.H"
 #include "commDataLayer.H"
-#include <nlohmann/json.hpp>
 #include "registeredObject.H"
-#include "json.H"
+#include "FMU_json.H"
 
 using json = nlohmann::json;
 
@@ -46,6 +45,24 @@ namespace functionObjects
 }
 }
 
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+template<class T>
+void Foam::functionObjects::FMUSimulator::sync_regObjects(objectRegistry& obj)
+{
+    forAllIters(obj, iter)
+    {
+        regIOobject* obj = iter.val();
+        if (isType<registeredObject<T>>(*obj))
+        {
+            registeredObject<T>& regObj =
+                refCast<registeredObject<T> > (*obj);
+
+            Pstream::scatter(regObj.ref());
+
+        }
+    }
+}
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
@@ -94,44 +111,41 @@ bool Foam::functionObjects::FMUSimulator::execute()
 
     commDataLayer& data = commDataLayer::New(time_);
 
-    const auto& regOut = data.getRegistry(commDataLayer::causality::out);
-    json jOutput;
-    jOutput["t"]  = time_.value();
-    jOutput["dt"] = time_.deltaTValue();
+    // const auto& regOut = data.getRegistry(commDataLayer::causality::out);
+    // json jOutput;
+    // jOutput["t"]  = time_.value();
+    // jOutput["dt"] = time_.deltaTValue();
 
-
-    forAllConstIters(regOut, iter)
+    Info << "communicate data" << endl;
+    if (Pstream::master())
     {
-        const regIOobject* obj = iter.val();
-        if (isType<registeredObject<scalar>>(*obj))
-        {
-            const registeredObject<scalar>& regScalar =
-                refCast<const registeredObject<scalar> > (*obj);
+        oms_.stepUntil(time_.value());
+        // send
+        const auto& regOut = data.getRegistry(commDataLayer::causality::out);
+        json jOutput;
+        jOutput["t"]  = time_.value();
+        jOutput["dt"] = time_.deltaTValue();
 
-            add_to_json(jOutput,regScalar);
+        // build output json
+        add_to_json<scalar>(jOutput,regOut);
+        add_to_json<vector>(jOutput,regOut);
 
-        }
-        if (isType<registeredObject<vector>>(*obj))
-        {
+        Info << "jOutput " << word(jOutput.dump()) << endl;
+        oms_.from_OF(word(jOutput.dump()));
+        
+        // receive
+        auto& regIn = data.getRegistry(commDataLayer::causality::in);
 
-            const registeredObject<vector>& regVector =
-                refCast<const registeredObject<vector> > (*obj);
+        word jInput  = oms_.to_OF();
+        Info << "jInput" << jInput << endl;
+        json input = json::parse(jInput);
 
-            add_to_json(jOutput,regVector);
-        }
+        // update input data
+        get_from_json<scalar>(input,regIn);
+        get_from_json<vector>(input,regIn);
+
     }
 
-    oms_.from_OF(word(jOutput.dump()));
-
-    oms_.stepUntil(time_.value());
-    word out  = oms_.to_OF();
-    auto jout = json::parse(out);
-
-    for (auto& el : jout.items())
-    {
-        scalar& var = data.getObj<scalar>(el.key(),commDataLayer::causality::in);
-        var = el.value();
-    }
 
     return true;
 }

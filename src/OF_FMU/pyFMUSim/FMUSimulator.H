@@ -70,7 +70,7 @@ class FMUSimulator
 :
     public functionObject
 {
-protected:
+private:
 
     // Private data
     pyFMUSim oms_;
@@ -79,14 +79,15 @@ protected:
 
     externalIOObjectList extIOList_;
 
+    // Private Member Functions
+    template<class T>
+    void sync_regObjects(objectRegistry& obj);
 
-    // Protected Member Functions
+    //- No copy construct
+    FMUSimulator(const FMUSimulator&) = delete;
 
-        //- No copy construct
-        FMUSimulator(const FMUSimulator&) = delete;
-
-        //- No copy assignment
-        void operator=(const FMUSimulator&) = delete;
+    //- No copy assignment
+    void operator=(const FMUSimulator&) = delete;
 
 
 public:
