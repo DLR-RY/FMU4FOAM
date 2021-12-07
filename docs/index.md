@@ -1,12 +1,12 @@
 ---
-title: "ECI4FOAM"
+title: "FMU4FOAM"
 keywords: sample homepage
 sidebar: doc_sidebar
 permalink: index.html
-summary: ECI4FOAM with testsuite and documenation
+summary: FMU4FOAM with testsuite and documenation
 ---
 
-ECI4FOAM to quickly generate a library with testsuite and hosted documenation
+FMU4FOAM to quickly generate a library with testsuite and hosted documenation
 
 zip or clone this library and edit it from there
 

@@ -2,7 +2,7 @@
 
 entries:
 - title: sidebar
-  product: External Coupling Interface for FOAM
+  product: FMI Coupling Interface for FOAM
   version: 0.1
   folders:
 

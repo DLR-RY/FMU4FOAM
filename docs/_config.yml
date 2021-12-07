@@ -1,21 +1,21 @@
-repository: HenningScheufler/ECI4FOAM
+repository: HenningScheufler/FMU4FOAM
 
 output: web
 # this property is useful for conditional filtering of content that is separate from the PDF.
 
-topnav_title: External Coupling Interface for FOAM
+topnav_title: FMI Coupling Interface for FOAM
 # this appears on the top navigation bar next to the home button
 
-site_title: External Coupling Interface for FOAM
+site_title: FMI Coupling Interface for FOAM
 # this appears in the html browser tab for the site title (seen mostly by search engines, not users)
 
 company_name: Copyright 2021 DLR
 # this appears in the footer
 
-github_editme_path: HenningScheufler/ECI4FOAM/blob/master/doc
+github_editme_path: HenningScheufler/FMU4FOAM/blob/master/doc
 # if you're using Github, provide the basepath to the branch you've created for reviews, following the sample here. if not, leave this value blank.
 
-# gitlab_editme_path: HenningScheufler/ECI4FOAM/blob/master/doc
+# gitlab_editme_path: HenningScheufler/FMU4FOAM/blob/master/doc
 # if you're using GitLab, provide the basepath to the branch you've created for reviews, following the sample here. if not, leave this value blank.
 
 google_analytics: UA-66296557-1
@@ -33,7 +33,7 @@ exclude:
   - vendor
 # these are the files and directories that jekyll will exclude from the build
 
-feedback_subject_line: ECI4FOAM
+feedback_subject_line: FMU4FOAM
 
 feedback_email: test@gmail.com
 # used as a contact email for the Feedback link in the top navigation bar
@@ -108,7 +108,7 @@ description: "Intended as a documentation theme based on Jekyll for technical wr
 
 # needed for sitemap.xml file only
 # url: henningscheufler.github.io
-# baseurl: /ECI4FOAM/docs
+# baseurl: /FMU4FOAM/docs
 
 
 github: [metadata]

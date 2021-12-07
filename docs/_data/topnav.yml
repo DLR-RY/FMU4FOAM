@@ -4,7 +4,7 @@ topnav:
 - title: Topnav
   items:
     - title: GitHub
-      external_url: https://github.com/HenningScheufler/ECI4FOAM
+      external_url: https://github.com/HenningScheufler/FMU4FOAM
     - title: Documentation
       url: /doc_introduction.html
 
