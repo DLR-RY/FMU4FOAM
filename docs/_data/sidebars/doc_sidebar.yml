@@ -65,6 +65,11 @@ entries:
       url: /doc_fuelTruck.html
       output: web, pdf
 
+    - title: Temperature Control in a Flange
+      url: /doc_TempControlFlange.html
+      output: web, pdf
+
+      
   - title: Release Notes
     output: web, pdf
     folderitems:
