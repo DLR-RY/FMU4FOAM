@@ -2,14 +2,22 @@
 
 > A lightweight framework that enables the packaging of Python 3 code or CSV files as co-simulation FMUs (following FMI version 2.0).
 
+### Documentation
 
-### How do I build an FMU from python code?
+
+[Documentation](https://DLR-RY.github.io/FMU4FOAM/)
+
+
+
+### How to install?
+
+
 
 1. Install `FMU4FOAM` package:
 
 requires conan and pythonfmu
 ```bash
-pip install .
+pip install fmu4foam
 ```
 ### Compile OpenFOAM
 
@@ -18,15 +26,13 @@ pip install .
 ./Allwmake
 ```
 
+more details are found in the [documentation](https://DLR-RY.github.io/FMU4FOAM/)
 
-### Create FMU
+### run example
 
-
-```bash
-cd test
-fmu4foam build -f test-example.py -of damBreak/ --no-external-tool
-```
 
 ```bash
-python test-omsim.py > log
+cd examples/TempControlFlange/
+./Allrun
 ```
+
