@@ -1,0 +1,43 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2012                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      externalCouplingDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+externalFunctions
+{
+    extSensor
+    {
+        type extSensor;
+        sensorName Tout;
+        fieldName T;
+        sensorPosition (-0.01 0 0);
+        // patches (".*");
+        // CofR  (0 0 0);
+        // forceName force;
+        // momentName moment;
+    }
+
+    extPara
+    {
+        type extFunction;
+        function constant 0;
+        varName dTout;
+        // patches (".*");
+        // CofR  (0 0 0);
+        // forceName force;
+        // momentName moment;
+    }
+}
+// ************************************************************************* //
