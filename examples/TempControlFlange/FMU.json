@@ -1,0 +1,8 @@
+{
+    "mapping": [["Tin","model.root.system1.Tin"],
+                ["dTin","model.root.system1.dTin"],
+                ["Qout","model.root.system1.Qout"]],
+    "from_OF": {"Tin":"REAL",
+                "dTin":"REAL"},
+    "to_OF":   {"Qout":"REAL"}
+}
