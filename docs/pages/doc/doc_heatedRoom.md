@@ -8,6 +8,7 @@ folder: doc
 
 ## heated Room
 
+{% include image.html file="heatedRoom/HVACSystem.png"  alt="HVACSystem" caption="HVACSystem" %}
 {% include image.html file="heatedRoom/heatRoom.png"  alt="heatRoom" caption="heatRoom" %}
 {% include image.html file="heatedRoom/heatflux.png"  alt="heatflux" caption="heatflux" %}
 {% include image.html file="heatedRoom/massflux.png"  alt="massflux" caption="massflux" %}
