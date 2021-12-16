@@ -41,16 +41,20 @@ entries:
       url: /doc_installation.html
       output: web, pdf
 
-  - title: Library Design
+  - title: Usage
     output: web, pdf
     folderitems:
 
-    - title: OpenFOAM
-      url: /doc_OpenFOAM.html
+    - title: run FMUs in OpenFOAM
+      url: /doc_FMUinOF.html
       output: web, pdf
 
-    - title: Library Design
-      url: /doc_architecture.html
+    - title: OpenFOAM as FMU
+      url: /doc_OfasFMU.html
+      output: web, pdf
+
+    - title: Input and Output parameters
+      url: /doc_inputOutput.html
       output: web, pdf
 
   - title: Examples
