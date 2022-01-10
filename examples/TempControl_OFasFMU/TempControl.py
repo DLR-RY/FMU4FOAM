@@ -26,7 +26,10 @@ class TempControl(OF2Fmu):
         self.STDGRAD = "pointCellsLeastSquares"
         
 
-        self.register_variable(String("STDGRAD", causality=Fmi2Causality.parameter))
-        self.register_variable(String("STDLAP", causality=Fmi2Causality.parameter))
-        self.register_variable(Real("writeInterval", causality=Fmi2Causality.parameter))
+        self.register_variable(String("STDGRAD", 
+            causality=Fmi2Causality.parameter, variability=Fmi2Variability.tunable))
+        self.register_variable(String("STDLAP", 
+            causality=Fmi2Causality.parameter, variability=Fmi2Variability.tunable))
+        self.register_variable(Real("writeInterval", 
+            causality=Fmi2Causality.parameter, variability=Fmi2Variability.tunable))
 

@@ -9,6 +9,7 @@ folder: doc
 ## Fuel Truck
 
 
+{% include image.html file="fuelTruck/FuelTruck.png"  alt="FuelTruck" caption="FuelTruck" %}
 {% include image.html file="fuelTruck/pos_at_0s.png"  alt="position0" caption="position at zero" %}
 {% include image.html file="fuelTruck/pos_at_5s.png"  alt="position5" caption="pos at 5s" %}
 {% include image.html file="fuelTruck/position.png"   alt="position" caption="position" %}
