@@ -1,6 +1,6 @@
 # FMU4FOAM
 
-> A lightweight framework that enables the packaging of Python 3 code or CSV files as co-simulation FMUs (following FMI version 2.0).
+> A framework that enables the coupling of OpenFOAM with FMUs or the distribution of OpenFOAM as an FMU
 
 ### Documentation
 
