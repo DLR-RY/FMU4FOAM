@@ -19,7 +19,7 @@ License
 
 #include "pyFMUSim.H"
 #include "pyInterp.H"
-
+#include "sigFpe.H"
 
 namespace py = pybind11;
 // using namespace py::literals;
@@ -40,11 +40,17 @@ Foam::pyFMUSim::pyFMUSim
     FMUs_()
 {
     pyInterp::New(time);
+
+    // numpy causes a float point exception of loaded with OpenFOAM 
+    // sigFpe so we temporally deactivate sigFpe we will only loose the 
+    // stacktrace if deactivated
+    sigFpe::unset(false);
     py::object pyC = py::module_::import(pymodule.c_str()).attr(pyclass.c_str());
     
     // construct FMUs with endTime add margin
     // if stepUntil is biggger than endTime the FMU does not exist
     scalar endTime = time.endTime().value()*1.1;
     FMUs_ = pyC(endTime,"FMU.json");
+    sigFpe::set(false);
 }
 // ************************************************************************* //
