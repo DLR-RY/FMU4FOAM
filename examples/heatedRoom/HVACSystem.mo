@@ -60,12 +60,12 @@ model HVACSystem "simple HVAC System"
     Placement(visible = true, transformation(origin = {8, -60}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   Modelica.Blocks.Continuous.LimPID limPID(Td = 0, Ti = 10, initType = Modelica.Blocks.Types.InitPID.InitialState, k = 1, limitsAtInit = true, xd_start = 0, xi_start = 0, yMax = 10, yMin = 0.00001, y_start = 10000) annotation(
     Placement(visible = true, transformation(origin = {-76, 84}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  Modelica.Blocks.Interfaces.RealInput Tin annotation(
-    Placement(visible = true, transformation(origin = {-150, 50}, extent = {{-12, -12}, {12, 12}}, rotation = 0), iconTransformation(origin = {-176, 46}, extent = {{-20, -20}, {20, 20}}, rotation = 0)));
   Modelica.Blocks.Interfaces.RealInput Tinlet annotation(
     Placement(visible = true, transformation(origin = {-168, 24}, extent = {{-12, -12}, {12, 12}}, rotation = 0), iconTransformation(origin = {-176, 46}, extent = {{-20, -20}, {20, 20}}, rotation = 0)));
   Modelica.Blocks.Sources.Ramp ramp(duration = 150, height = 30, offset = 298, startTime = 50)  annotation(
     Placement(visible = true, transformation(origin = {-174, 84}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  Modelica.Blocks.Interfaces.RealInput Tin annotation(
+    Placement(visible = true, transformation(origin = {-150, 50}, extent = {{-12, -12}, {12, 12}}, rotation = 0)));
 equation
   connect(ambient1.flowPort, pump.flowPort_a) annotation(
     Line(points = {{-90, 30}, {-40, 30}}, color = {255, 0, 0}));
@@ -102,17 +102,17 @@ equation
   connect(heatFlowSensor.port_b, heatCapacitor.port) annotation(
     Line(points = {{18, -60}, {30, -60}}, color = {191, 0, 0}));
   connect(limPID.y, pump.volumeFlow) annotation(
-    Line(points = {{-64, 84}, {-30, 84}, {-30, 40}}, color = {0, 0, 127}));
-  connect(Tin, limPID.u_m) annotation(
-    Line(points = {{-150, 50}, {-76, 50}, {-76, 72}}, color = {0, 0, 127}));
+    Line(points = {{-65, 84}, {-30, 84}, {-30, 40}}, color = {0, 0, 127}));
   connect(Tinlet, ambient1.ambientTemperature) annotation(
     Line(points = {{-168, 24}, {-110, 24}}, color = {0, 0, 127}));
   connect(ramp.y, limPID.u_s) annotation(
     Line(points = {{-163, 84}, {-88, 84}}, color = {0, 0, 127}));
   connect(ramp.y, pid.u_s) annotation(
-    Line(points = {{-162, 84}, {-134, 84}, {-134, 0}, {-96, 0}}, color = {0, 0, 127}));
+    Line(points = {{-163, 84}, {-134, 84}, {-134, 0}, {-96, 0}}, color = {0, 0, 127}));
   connect(Tin, pid.u_m) annotation(
     Line(points = {{-150, 50}, {-134, 50}, {-134, -24}, {-84, -24}, {-84, -12}}, color = {0, 0, 127}));
+  connect(Tin, limPID.u_m) annotation(
+    Line(points = {{-150, 50}, {-76, 50}, {-76, 72}}, color = {0, 0, 127}));
   annotation(
     Documentation(info = "<html>
 <p>
