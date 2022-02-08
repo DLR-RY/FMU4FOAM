@@ -9,7 +9,7 @@ import json
 class FuelTruck(FMU4FOAM.FMUBase):
 
     def __init__(self,endTime,filename):
-        with open("FMU.json") as f:
+        with open("FMU_uncoupled.json") as f:
             d = json.load(f)
         # create mapping and file
         self.data = [x[1] for x in d["mapping"]]
@@ -51,8 +51,7 @@ class FuelTruck(FMU4FOAM.FMUBase):
     def stepUntil(self,t):
         t_old, _ = self.oms.getTime("model")
         step_size = t - t_old
-        self.oms.setFixedStepSize("model.root", step_size/2)
-        self.oms.doStep("model")
+        self.oms.setFixedStepSize("model.root", step_size)
         self.oms.doStep("model")
 
         with open("results.csv", "a") as f:
@@ -68,7 +67,25 @@ class FuelTruck(FMU4FOAM.FMUBase):
         self.oms.terminate("model")
         self.oms.delete("model")
 
+    def run(self,nWrite=1000):
+            # simulation loop
+        step = (self.endTime - 0)/nWrite
+        comm_times = [step*interval for interval in range(nWrite)]
+        for t in comm_times:
+            #self.setVar("f_in[1]",-100)
+            #self.setVar("f_in[2]",1000)
+            # self.setVar("t_in[3]",1000)
+            self.stepUntil(t)
 
+    def __del__(self):
+        self.oms.terminate("model")
+        self.oms.delete("model")
+
+
+if __name__ == "__main__":
+
+    ft = FuelTruck(5.0, "FMU_uncoupled.json")
+    ft.run()
 
 # import OFFMU
 # from OMSimulator import OMSimulator

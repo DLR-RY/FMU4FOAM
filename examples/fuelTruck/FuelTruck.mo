@@ -1,8 +1,8 @@
 model FuelTruck "Rolling wheel set that is pulled by a force"
    extends Modelica.Icons.Example;
 
-  Modelica.Mechanics.MultiBody.Forces.WorldForce force(N_to_m = 1,animation = true, resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.world)
-    annotation (Placement(visible = true, transformation(extent = {{26, 42}, {46, 62}}, rotation = 0)));
+  Modelica.Mechanics.MultiBody.Forces.WorldForce force(animation=false)
+    annotation (Placement(visible = true, transformation(extent = {{20, 30}, {40, 50}}, rotation = 0)));
   inner Modelica.Mechanics.MultiBody.World world(
     label2="z",
     n={0,0,-1},
@@ -18,16 +18,16 @@ model FuelTruck "Rolling wheel set that is pulled by a force"
     theta1(displayUnit = "rad", fixed = true),
     theta2(displayUnit = "rad", fixed = true),
     wheelDistance=0.5,
-    wheelMass= 250,wheelRadius=0.1,
+    wheelMass=250,wheelRadius=0.1,
     wheel_I_axis= 5,
     wheel_I_long= 10,
     x( fixed=true,start= 0.0),
     y( fixed=true,start= 0.0))
     annotation (Placement(transformation(extent={{-20,-10},{0,10}})));
-  Modelica.Mechanics.MultiBody.Parts.Body body(
-    animation=false,m= 250, r_CM={0,0,0})
+  Modelica.Mechanics.MultiBody.Parts.Body body(m=0.01, r_CM={0,0,0},
+    animation=false)
     annotation (Placement(transformation(extent={{60,-10},{80,10}})));
-  Modelica.Blocks.Sources.CombiTimeTable combiTimeTable(table = [0, 1000, 0, 0; 1, 1000, 0, 0; 2, 1000, 0, 0; 3, 0, 1000, 0; 4, 0, 1000, 0; 5, 0, 1000, 0], tableOnFile = false)
+  Modelica.Blocks.Sources.CombiTimeTable combiTimeTable(table = [0, 4000, 0, 0; 1, 4000, 0, 0; 2, 4000, 0, 0; 4, 0, 4000, 0; 5, 0, 4000, 0], tableOnFile = false)
     annotation (Placement(transformation(extent={{-20,30},{0,50}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation fixedTranslation(
                        
@@ -46,13 +46,13 @@ model FuelTruck "Rolling wheel set that is pulled by a force"
     final extra=0.8) annotation (Placement(transformation(extent={{-10,-10},
             {10,10}},
         origin={70,30})));
-  Modelica.Mechanics.MultiBody.Sensors.AbsoluteSensor absoluteSensor(animation = false,get_angles = true, get_r = true, resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameA.frame_a)  annotation(
+  Modelica.Mechanics.MultiBody.Sensors.AbsoluteSensor absoluteSensor(animation = false,get_angles = true, get_r = true, resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameA.world)  annotation(
     Placement(visible = true, transformation(origin = {20, -28}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   Modelica.Blocks.Interfaces.RealOutput[3] pos_out annotation(
     Placement(visible = true, transformation(origin = {-30, -84}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {44, -82}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   Modelica.Blocks.Interfaces.RealOutput[3] RPY_out annotation(
     Placement(visible = true, transformation(origin = {48, -80}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {8, -82}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque Forces_Sloshing annotation(
+  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque Forces_Sloshing(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.world)  annotation(
     Placement(visible = true, transformation(origin = {16, 78}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   Modelica.Blocks.Interfaces.RealInput[3] f_in annotation(
     Placement(visible = true, transformation(origin = {-54, 72}, extent = {{-12, -12}, {12, 12}}, rotation = 0), iconTransformation(origin = {-56, 82}, extent = {{-20, -20}, {20, 20}}, rotation = 0)));
@@ -60,13 +60,13 @@ model FuelTruck "Rolling wheel set that is pulled by a force"
     Placement(visible = true, transformation(origin = {-48, 84}, extent = {{-12, -12}, {12, 12}}, rotation = 0), iconTransformation(origin = {-56, 82}, extent = {{-20, -20}, {20, 20}}, rotation = 0)));
 equation
   connect(combiTimeTable.y, force.force) annotation(
-    Line(points = {{1, 40}, {10.5, 40}, {10.5, 52}, {24, 52}}, color = {0, 0, 127}));
+    Line(points = {{1, 40}, {18, 40}}, color = {0, 0, 127}));
   connect(fixedTranslation.frame_a, wheelSet.frameMiddle) annotation(
     Line(points = {{20, 0}, {10, 0}, {10, -4}, {-10, -4}, {-10, -2}}, color = {95, 95, 95}, thickness = 0.5));
   connect(fixedTranslation.frame_b, body.frame_a) annotation(
     Line(points = {{40, 0}, {60, 0}}, color = {95, 95, 95}, thickness = 0.5));
   connect(force.frame_b, fixedTranslation.frame_b) annotation(
-    Line(points = {{46, 52}, {46, 0}, {40, 0}}, color = {95, 95, 95}, thickness = 0.5));
+    Line(points = {{40, 40}, {40, 0}}, color = {95, 95, 95}, thickness = 0.5));
   connect(shape.frame_a, fixedTranslation.frame_b) annotation(
     Line(points = {{60, 30}, {50, 30}, {50, 0}, {40, 0}}, color = {95, 95, 95}, thickness = 0.5));
   connect(wheelSet.frameMiddle, absoluteSensor.frame_a) annotation(
@@ -88,6 +88,5 @@ equation
 Demonstrates how a RollingWheelSet (two wheels rigidly coupled together) is rolling
 on ground when pulled by an external force..
 </p>
-</html>"),
-    uses(Modelica(version = "3.2.3")));
+</html>"));
 end FuelTruck;

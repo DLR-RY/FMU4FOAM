@@ -61,6 +61,16 @@ solvers
         maxIter         20;
     }
 
+
+    U
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        tolerance       1e-06;
+        relTol          0;
+        nSweeps         1;
+    }
+
     UFinal
     {
         solver          smoothSolver;
@@ -78,6 +88,7 @@ PIMPLE
     nNonOrthogonalCorrectors 1;
     correctPhi      yes;
     checkMeshCourantNo  yes;
+    nOuterCorrectors   1;
 
     //pRefPoint       (0 0 0);
     pRefCell        0;
