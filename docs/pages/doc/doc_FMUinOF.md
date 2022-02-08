@@ -44,12 +44,14 @@ from OMSimulator import OMSimulator
 class controlledTemperature(FMU4FOAM.FMUBase):
 
     def __init__(self,endTime,filename):
+        super().__init__(endTime,filename)
+        
         self.oms = OMSimulator()
-        super().__init__(filename,self.oms)
         self.oms.setTempDirectory("./temp/")
         self.oms.newModel("model")
         self.oms.addSystem("model.root", self.oms.system_wc)
 
+        # instantiate FMUs
         self.oms.addSubModel("model.root.system1", "ControlledTemperatureCoupled.fmu")
 
         # simulation settings
@@ -57,14 +59,20 @@ class controlledTemperature(FMU4FOAM.FMUBase):
         self.oms.setStopTime("model", endTime)
         # self.oms.setFixedStepSize("model.root", 1e-7)
 
-        # instantiate FMUs
         self.oms.instantiate("model")
         self.oms.setReal("model.root.system1.Tin", 298)
         self.oms.setReal("model.root.system1.dTin", 0)
 
         self.oms.initialize("model")
 
+    def setVar(self, key: str, val: float) -> None:
+        return self.oms.setReal(key,val)
+
+    def getVar(self, key: str) -> float:
+        return self.oms.getReal(key)[0]
+
     def stepUntil(self,t):
+        self.oms.setReal("model.root.system1.dTin", 0)
         self.oms.stepUntil("model",t)
 
     def __del__(self):
@@ -72,7 +80,7 @@ class controlledTemperature(FMU4FOAM.FMUBase):
         self.oms.delete("model")
 ```
 
-It consists of a constructor that the initilzes the simulation, a destructor that finalizes the simulation and a method that advances the FMU system in time called stepUntil. The data transfer between OpenFOAM and the FMUs is handled by FMUBase with the method *from_OF* and *to_OF*:
+It consists of a constructor that the initilzes the simulation, a destructor that finalizes the simulation and a method that advances the FMU system in time called stepUntil. The data transfer between OpenFOAM and the FMUs is handled by FMUBase with the method *from_OF* and *to_OF* and requires the definition of setVar and getVar:
 
 
 ```python
@@ -80,16 +88,24 @@ It consists of a constructor that the initilzes the simulation, a destructor tha
 
      ...
 
+    @abstractmethod
+    def setVar(key: str,val: float) -> None:
+        pass
+
+    @abstractmethod
+    def getVar(key: str) -> float:
+        pass
+
     def from_OF(self,dumped_input_json : str):
         ext_inputs = json.loads(dumped_input_json)
         for k in self.coupleData.from_OF:
             var = (k,ext_inputs[k])
-            self.coupleData.setValue(self.oms,var)
+            self.setValue(self.setVar,var)
 
     def to_OF(self) -> str:
         d = {}
         for k in self.coupleData.to_OF:
-            d[k] = self.coupleData.getValue(self.oms,k)
+            d[k] = self.getValue(self.getVar,k)
         return str(json.dumps(d))
 ```
 
