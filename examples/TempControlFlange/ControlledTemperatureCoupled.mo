@@ -7,66 +7,62 @@ model ControlledTemperatureCoupled "Control temperature of a resistor"
   output Modelica.SIunits.Temperature TRes(displayUnit="degC") = heatingResistor.T_heatPort
     "Resulting Temperature";
   Modelica.Electrical.Analog.Basic.Ground ground
-                              annotation (Placement(transformation(extent={
-            {-100,-100},{-80,-80}})));
+                              annotation (Placement(visible = true, transformation(extent = {{-96, -96}, {-76, -76}}, rotation = 0)));
   Modelica.Electrical.Analog.Sources.ConstantVoltage constantVoltage(V=0.05)
                                                         annotation (Placement(
-        transformation(
-        origin={-90,-50},
-        extent={{-10,-10},{10,10}},
-        rotation=270)));
+        visible = true, transformation(origin = {-86, -46}, extent = {{-10, -10}, {10, 10}}, rotation = 270)));
   Modelica.Electrical.Analog.Basic.HeatingResistor heatingResistor(
     R_ref=10,
     T_ref=293.15,
-    alpha=1/255, useHeatPort = true) annotation (Placement(visible = true, transformation(origin = {-24, -50}, extent = {{-10, 10}, {10, -10}}, rotation = 270)));
+    alpha=1/255, useHeatPort = true) annotation (Placement(visible = true, transformation(origin = {-20, -46}, extent = {{-10, 10}, {10, -10}}, rotation = 270)));
   Modelica.Electrical.Analog.Ideal.IdealOpeningSwitch idealSwitch
-        annotation (Placement(transformation(extent={{-70,-50},{-50,-30}})));
+        annotation (Placement(visible = true, transformation(extent = {{-66, -46}, {-46, -26}}, rotation = 0)));
   Modelica.Blocks.Sources.Ramp ramp(
     
     duration=10,height=25,
     offset= 298.15,
-    startTime=2) annotation (Placement(visible = true, transformation(extent = {{40, 0}, {20, 20}}, rotation = 0)));
+    startTime=2) annotation (Placement(visible = true, transformation(extent = {{44, 4}, {24, 24}}, rotation = 0)));
   Modelica.Blocks.Logical.OnOffController onOffController(bandwidth=TDif)
-    annotation (Placement(visible = true, transformation(extent = {{0, -6}, {-20, 14}}, rotation = 0)));
+    annotation (Placement(visible = true, transformation(extent = {{4, -2}, {-16, 18}}, rotation = 0)));
   Modelica.Blocks.Logical.Not logicalNot
-                                   annotation (Placement(visible = true, transformation(extent = {{-30, -6}, {-50, 14}}, rotation = 0)));
+                                   annotation (Placement(visible = true, transformation(extent = {{-26, -2}, {-46, 18}}, rotation = 0)));
   Modelica.Thermal.HeatTransfer.Components.GeneralTemperatureToHeatFlowAdaptor temperatureToHeatFlowAdaptor(use_pder = true)  annotation(
-    Placement(visible = true, transformation(origin = {32, -50}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+    Placement(visible = true, transformation(origin = {36, -46}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
   Modelica.Blocks.Interfaces.RealInput dTin annotation(
-    Placement(visible = true, transformation(origin = {74, -56}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+    Placement(visible = true, transformation(origin = {78, -52}, extent = {{10, -10}, {-10, 10}}, rotation = 0), iconTransformation(extent = {{10, -10}, {-10, 10}}, rotation = 0)));
   Modelica.Blocks.Interfaces.RealInput Tin annotation(
-    Placement(visible = true, transformation(origin = {74, -42}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
+    Placement(visible = true, transformation(origin = {78, -38}, extent = {{10, -10}, {-10, 10}}, rotation = 0), iconTransformation(extent = {{10, -10}, {-10, 10}}, rotation = 0)));
   Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor temperatureSensor annotation(
-    Placement(visible = true, transformation(origin = {16, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+    Placement(visible = true, transformation(origin = {20, -26}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   Modelica.Blocks.Interfaces.RealOutput Qout annotation(
-    Placement(visible = true, transformation(origin = {64, -86}, extent = {{-10, -10}, {10, 10}}, rotation = 180), iconTransformation(origin = {74, -86}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+    Placement(visible = true, transformation(origin = {68, -82}, extent = {{-10, -10}, {10, 10}}, rotation = 180), iconTransformation(origin = {74, -86}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
 equation
   connect(constantVoltage.n, heatingResistor.n) annotation(
-    Line(points = {{-90, -60}, {-24, -60}}, color = {0, 0, 255}));
+    Line(points = {{-86, -56}, {-20, -56}}, color = {0, 0, 255}));
   connect(constantVoltage.n, ground.p) annotation(
-    Line(points = {{-90, -60}, {-90, -80}}, color = {0, 0, 255}));
+    Line(points = {{-86, -56}, {-86, -76}}, color = {0, 0, 255}));
   connect(constantVoltage.p, idealSwitch.p) annotation(
-    Line(points = {{-90, -40}, {-70, -40}}, color = {0, 0, 255}));
+    Line(points = {{-86, -36}, {-66, -36}}, color = {0, 0, 255}));
   connect(idealSwitch.n, heatingResistor.p) annotation(
-    Line(points = {{-50, -40}, {-24, -40}}, color = {0, 0, 255}));
+    Line(points = {{-46, -36}, {-20, -36}}, color = {0, 0, 255}));
   connect(ramp.y, onOffController.reference) annotation(
-    Line(points = {{19, 10}, {2, 10}}, color = {0, 0, 127}));
+    Line(points = {{23, 14}, {6, 14}}, color = {0, 0, 127}));
   connect(onOffController.y, logicalNot.u) annotation(
-    Line(points = {{-21, 4}, {-28, 4}}, color = {255, 0, 255}));
+    Line(points = {{-17, 8}, {-24, 8}}, color = {255, 0, 255}));
   connect(logicalNot.y, idealSwitch.control) annotation(
-    Line(points = {{-51, 4}, {-60, 4}, {-60, -33}}, color = {255, 0, 255}));
+    Line(points = {{-47, 8}, {-56, 8}, {-56, -29}}, color = {255, 0, 255}));
   connect(heatingResistor.heatPort, temperatureToHeatFlowAdaptor.heatPort) annotation(
-    Line(points = {{-14, -50}, {30, -50}}, color = {191, 0, 0}));
+    Line(points = {{-10, -46}, {34, -46}}, color = {191, 0, 0}));
   connect(dTin, temperatureToHeatFlowAdaptor.pder) annotation(
-    Line(points = {{74, -56}, {40, -56}, {40, -45}, {35, -45}}, color = {0, 0, 127}));
+    Line(points = {{78, -52}, {44, -52}, {44, -41}, {39, -41}}, color = {0, 0, 127}));
   connect(temperatureToHeatFlowAdaptor.p, Tin) annotation(
-    Line(points = {{35, -42}, {74, -42}}, color = {0, 0, 127}));
+    Line(points = {{39, -38}, {78, -38}}, color = {0, 0, 127}));
   connect(heatingResistor.heatPort, temperatureSensor.port) annotation(
-    Line(points = {{-14, -50}, {16, -50}, {16, -40}}, color = {191, 0, 0}));
+    Line(points = {{-10, -46}, {20, -46}, {20, -36}}, color = {191, 0, 0}));
   connect(temperatureSensor.T, onOffController.u) annotation(
-    Line(points = {{16, -20}, {16, -2}, {2, -2}}, color = {0, 0, 127}));
+    Line(points = {{20, -16}, {20, 2}, {6, 2}}, color = {0, 0, 127}));
   connect(Qout, temperatureToHeatFlowAdaptor.f) annotation(
-    Line(points = {{64, -86}, {38, -86}, {38, -58}, {36, -58}}, color = {0, 0, 127}));
+    Line(points = {{68, -82}, {42, -82}, {42, -54}, {40, -54}}, color = {0, 0, 127}));
   annotation (Documentation(info="<html>
 <p>
 A constant voltage of 10 V is applied to a

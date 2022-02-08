@@ -1,15 +1,15 @@
-import OFFMU
+import FMU4FOAM
 from OMSimulator import OMSimulator
 import json
 import os
 import pytest
 
 
-class HVACSystem(OFFMU.FMUBase):
+class HVACSystem(FMU4FOAM.FMUBase):
 
     def __init__(self,endTime,filename):
+        super().__init__(endTime,filename)
         self.oms = OMSimulator()
-        super().__init__(filename,self.oms)
         self.oms.setTempDirectory("./temp/")
         self.oms.newModel("model")
         self.oms.addSystem("model.root", self.oms.system_wc)
@@ -26,6 +26,12 @@ class HVACSystem(OFFMU.FMUBase):
         self.oms.setReal("model.root.system1.Tin", 298)
 
         self.oms.initialize("model")
+
+    def setVar(self, key: str, val: float) -> None:
+        return self.oms.setReal(key,val)
+
+    def getVar(self, key: str) -> float:
+        return self.oms.getReal(key)[0]
 
     def stepUntil(self,t):
         self.oms.stepUntil("model",t)
