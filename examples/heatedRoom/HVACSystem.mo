@@ -64,7 +64,7 @@ model HVACSystem "simple HVAC System"
     Placement(visible = true, transformation(origin = {-168, 24}, extent = {{-12, -12}, {12, 12}}, rotation = 0), iconTransformation(origin = {-176, 46}, extent = {{-20, -20}, {20, 20}}, rotation = 0)));
   Modelica.Blocks.Sources.Ramp ramp(duration = 150, height = 30, offset = 298, startTime = 50)  annotation(
     Placement(visible = true, transformation(origin = {-174, 84}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-  Modelica.Blocks.Interfaces.RealInput Tin annotation(
+  Modelica.Blocks.Interfaces.RealInput TSensor annotation(
     Placement(visible = true, transformation(origin = {-150, 50}, extent = {{-12, -12}, {12, 12}}, rotation = 0)));
 equation
   connect(ambient1.flowPort, pump.flowPort_a) annotation(
@@ -109,9 +109,9 @@ equation
     Line(points = {{-163, 84}, {-88, 84}}, color = {0, 0, 127}));
   connect(ramp.y, pid.u_s) annotation(
     Line(points = {{-163, 84}, {-134, 84}, {-134, 0}, {-96, 0}}, color = {0, 0, 127}));
-  connect(Tin, pid.u_m) annotation(
+  connect(TSensor, pid.u_m) annotation(
     Line(points = {{-150, 50}, {-134, 50}, {-134, -24}, {-84, -24}, {-84, -12}}, color = {0, 0, 127}));
-  connect(Tin, limPID.u_m) annotation(
+  connect(TSensor, limPID.u_m) annotation(
     Line(points = {{-150, 50}, {-76, 50}, {-76, 72}}, color = {0, 0, 127}));
   annotation(
     Documentation(info = "<html>
