@@ -1,5 +1,5 @@
 {
-    "mapping": [["TempSens","model.root.system1.Tin"],
+    "mapping": [["TempSens","model.root.system1.TSensor"],
                 ["Toutlet","model.root.system1.Tinlet"],
                 ["Tin","model.root.system1.Tout"],
                 ["mdotin","model.root.system1.mout"]],

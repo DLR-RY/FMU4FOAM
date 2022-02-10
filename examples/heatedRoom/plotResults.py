@@ -12,7 +12,7 @@ T.columns = colval
 
 T = T[T["time"] > 0.01]
 
-plt.plot(T["time"],T["Tin"],label="Tsensor")
+plt.plot(T["time"],T["TSensor"],label="Tsensor")
 plt.plot(T["time"],T["limPID.u_s"],label="Target")
 plt.legend()
 plt.title("Target and measured temperature")
@@ -38,7 +38,7 @@ plt.title("Temperature at the inlet")
 plt.xlabel("time [s]")
 plt.ylabel("T [K]")
 plt.tight_layout()
-plt.savefig("results/heatflox.png")
+plt.savefig("results/heatflux.png")
 # plt.figure()
 # plt.plot(T["time"],T["Tout"],label="Tout")
 # plt.legend()
