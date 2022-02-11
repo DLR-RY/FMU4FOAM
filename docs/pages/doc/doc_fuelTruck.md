@@ -19,15 +19,15 @@ The FMU requires the sloshing forces and torque vector, and as FMI 2.0 does not 
 
 {% include image.html file="fuelTruck/fuelTruck_uncoupled.gif"  alt="results of the uncoupled simulation" caption="results of the uncoupled simulation" %}
 
-Comparing the uncoupled simulation and the coupled simulation shows that the fuel truck in the uncoupled simulation moves slightly faster as the fuel mass of roughly 250 kg is not considered. This is underlined by plotting the position over time. 
+Comparison of the uncoupled simulation and the coupled simulation shows that the fuel truck in the uncoupled simulation moves slightly faster as the fuel mass of roughly 250 kg is not considered. This is underlined by plotting the position over time. 
 
 {% include image.html file="fuelTruck/position.png"   alt="position" caption="position" %}
 
-As we also neglect the inertia of the fluid, the truck in the uncoupled simulation turns faster:
+As the inertia of the fluid is also neglected, the truck in the uncoupled simulation turns faster:
 
 {% include image.html file="fuelTruck/orientation.png"   alt="orientation" caption="orientation" %}
 
-The uncoupled simulation always predicts a sloshing force and torque of zero (see. FuelTruck_uncoupled.py) corresponding to massless fluid. 
+The uncoupled simulation always predicts a sloshing force and torque of zero (see. FuelTruck_uncoupled.py) corresponding to a massless fluid. 
 
 {% include image.html file="fuelTruck/force.png"   alt="orientation" caption="force" %}
 {% include image.html file="fuelTruck/torque.png"   alt="orientation" caption="torque" %}
