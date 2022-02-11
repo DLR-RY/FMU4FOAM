@@ -2,7 +2,7 @@
             Copyright (c) 2021, German Aerospace Center (DLR)
 -------------------------------------------------------------------------------
 License
-    This file is part of the VoFLibrary source code library, which is an
+    This file is part of the FMU4FOAM source code library, which is an
 	unofficial extension to OpenFOAM.
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -65,27 +65,30 @@ public:
 
     virtual ~pyFMUSim() = default;
 
+
     py::object& FMUs()
     {
         return FMUs_;
     }
+
 
     void stepUntil(scalar t)
     {
         FMUs_.attr("stepUntil")(t);
     }
     
+
     void from_OF(word dumped_json)
     {
         FMUs_.attr("from_OF")(dumped_json.c_str());
     }
+
 
     word to_OF()
     {
         return FMUs_.attr("to_OF")().cast<std::string>();
     }
     
-
 
 };
 

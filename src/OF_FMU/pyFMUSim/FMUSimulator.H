@@ -1,12 +1,8 @@
-
-
-
-
 /*---------------------------------------------------------------------------*\
             Copyright (c) 2021, German Aerospace Center (DLR)
 -------------------------------------------------------------------------------
 License
-    This file is part of the VoFLibrary source code library, which is an
+    This file is part of the FMU4FOAM source code library, which is an
 	unofficial extension to OpenFOAM.
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -73,8 +69,11 @@ class FMUSimulator
 private:
 
     // Private data
+
+    //- 
     pyFMUSim oms_;
 
+    //- time
     const Time& time_;
 
     externalIOObjectList extIOList_;

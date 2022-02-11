@@ -2,7 +2,7 @@
             Copyright (c) 2021, German Aerospace Center (DLR)
 -------------------------------------------------------------------------------
 License
-    This file is part of the VoFLibrary source code library, which is an
+    This file is part of the FMU4FOAM source code library, which is an
 	unofficial extension to OpenFOAM.
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ Foam::pyFMUSim::pyFMUSim
     py::object pyC = py::module_::import(pymodule.c_str()).attr(pyclass.c_str());
     
     // construct FMUs with endTime add margin
-    // if stepUntil is biggger than endTime the FMU does not exist
+    // if stepUntil is bigger than endTime the FMU may not exit
     scalar endTime = time.endTime().value()*1.1;
     FMUs_ = pyC(endTime,"FMU.json");
     sigFpe::set(false);

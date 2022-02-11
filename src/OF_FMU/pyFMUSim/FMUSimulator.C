@@ -2,7 +2,7 @@
             Copyright (c) 2021, German Aerospace Center (DLR)
 -------------------------------------------------------------------------------
 License
-    This file is part of the VoFLibrary source code library, which is an
+    This file is part of the FMU4FOAM source code library, which is an
 	unofficial extension to OpenFOAM.
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -107,16 +107,10 @@ bool Foam::functionObjects::FMUSimulator::execute()
     {
         f.execute();
     }
-    Info << "execute" << endl;
 
+    // get access to DataLayer
     commDataLayer& data = commDataLayer::New(time_);
 
-    // const auto& regOut = data.getRegistry(commDataLayer::causality::out);
-    // json jOutput;
-    // jOutput["t"]  = time_.value();
-    // jOutput["dt"] = time_.deltaTValue();
-
-    Info << "communicate data" << endl;
     if (Pstream::master())
     {
         oms_.stepUntil(time_.value());
@@ -130,14 +124,12 @@ bool Foam::functionObjects::FMUSimulator::execute()
         add_to_json<scalar>(jOutput,regOut);
         add_to_json<vector>(jOutput,regOut);
 
-        Info << "jOutput " << word(jOutput.dump()) << endl;
         oms_.from_OF(word(jOutput.dump()));
         
         // receive
         auto& regIn = data.getRegistry(commDataLayer::causality::in);
 
         word jInput  = oms_.to_OF();
-        Info << "jInput" << jInput << endl;
         json input = json::parse(jInput);
 
         // update input data
@@ -145,7 +137,6 @@ bool Foam::functionObjects::FMUSimulator::execute()
         get_from_json<vector>(input,regIn);
 
     }
-
 
     return true;
 }

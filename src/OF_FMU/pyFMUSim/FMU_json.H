@@ -2,7 +2,7 @@
             Copyright (c) 2021, German Aerospace Center (DLR)
 -------------------------------------------------------------------------------
 License
-    This file is part of the VoFLibrary source code library, which is an
+    This file is part of the FMU4FOAM source code library, which is an
 	unofficial extension to OpenFOAM.
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -15,10 +15,8 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::websocket
-
 Description
+    Defines the conversion from json to registered objects 
 
 Author
     Henning Scheufler, DLR, all rights reserved.
@@ -34,26 +32,32 @@ using json = nlohmann::json;
 
 namespace Foam
 {
+
+    
     void to_json(json& j, const registeredObject<scalar>& s)
     {
         j[s.name()] = s.ref();
     }
+
 
     void from_json(const json& j, registeredObject<scalar>& s)
     {
         s.ref() = j[s.name()];
     }
 
+
     void add_to_json(json& j, const registeredObject<scalar>& s)
     {
         j[s.name()] = s.ref();
     }
+
 
     void to_json(json& j, const registeredObject<vector>& s)
     {
         const vector& sref = s.ref();
         j[s.name()] = {sref.x(),sref.y(),sref.z()};
     }
+
 
     void from_json(const json& j, registeredObject<vector>& s)
     {
@@ -63,6 +67,7 @@ namespace Foam
         sref.z() = j[s.name() + "_z"];
     }
 
+
     void add_to_json(json& j, const registeredObject<vector>& s)
     {
         const vector& sref = s.ref();
@@ -70,6 +75,7 @@ namespace Foam
         j[s.name() + "_y"] = sref.y();
         j[s.name() + "_z"] = sref.z();
     }
+
 
     template<class T>
     void add_to_json(json& j,const objectRegistry& obj)
@@ -87,6 +93,7 @@ namespace Foam
             }
         }
     }
+
 
     template<class T>
     void get_from_json(const json& j,objectRegistry& obj)

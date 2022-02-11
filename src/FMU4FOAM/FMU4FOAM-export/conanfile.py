@@ -7,6 +7,7 @@ class fmu4foam(ConanFile):
     generators = "cmake"
 
     def build(self):
-        cmake = CMake(self) # it will find the packages by using our auto-generated FindXXX.cmake files
+        # it will find the packages by using our auto-generated FindXXX.cmake files
+        cmake = CMake(self) 
         cmake.configure()
         cmake.build()

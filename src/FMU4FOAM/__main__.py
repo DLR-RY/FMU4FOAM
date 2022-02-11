@@ -26,23 +26,6 @@ def cli_main():
     )
     builder.create_command_parser(build_parser)
 
-    # deploy_parser = subparsers.add_parser(
-    #     "deploy",
-    #     description="""Deploy a Python FMU.
-
-    #     The command will look in the `resources` folder for one of the following files:
-    #     `requirements.txt` or `environment.yml`.
-
-    #     If you specify a environment file but no package manager, `conda` will be selected
-    #     for `.yaml` and `.yml` otherwise `pip` will be used.
-
-    #     The tool assume the Python environment in which the FMU should be executed
-    #     is the current one.
-    #     """,
-    #     help="Install Python FMU dependencies."
-    # )
-    # deploy.create_command_parser(deploy_parser)
-
     options = vars(parser.parse_args())
     execute = options.pop("execute")
     execute(**options)
