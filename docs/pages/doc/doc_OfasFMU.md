@@ -12,7 +12,7 @@ folder: doc
     pip install fmu4foam
 ```
 
-creating an FMU from OpenFOAM is simple and is similar to the libary [PythonFMU](https://github.com/NTNU-IHB/PythonFMU) and is achieved with this one line:
+creating an FMU from OpenFOAM is simple and similar to the libary [PythonFMU](https://github.com/NTNU-IHB/PythonFMU) which is achieved with just one line:
 
 ```
     fmu4foam build -f TempControl.py -of OfCase/ --no-external-tool
@@ -20,7 +20,7 @@ creating an FMU from OpenFOAM is simple and is similar to the libary [PythonFMU]
 
 ### OpenFOAM modifications
 
-As in the previous method, we extend OpenFOAM with the addtional libraries and add follwing lines to the system/controlDict:
+As in the previous method, we extend OpenFOAM with the additional libraries and add the following lines to the system/controlDict:
 
 ```cpp
 // loads addtional input and output function/class
@@ -46,7 +46,7 @@ functions
 }
 ```
 
-the controlDict specifies two variables *host* and *port* that need to be specified in the system/simulationParameters:
+the controlDict specifies two variables: *host* and *port* that need to be specified in the system/simulationParameters:
 
 ```cpp
 /*--------------------------------*- C++ -*----------------------------------*\
@@ -75,15 +75,15 @@ writeInterval   0.1;
 
 // ************************************************************************* //
 ```
-The host and port variable are specified in the FMU generation base class. This enables as to change the:
+The host and port variable are specified in the FMU generation base class.
 
 - host -> connect to other computer
 - port -> port on that computer
 - outputPath -> extract dir of the OpenFOAM Case
 - oscmd -> name of the system command (enables exectuion on docker or wsl for windows users in the future)
-- arugments -> additional parameters for the Allrun script e.g. source enviroment in script
+- arguments -> additional parameters for the Allrun script e.g. source environment in script
 
-NOTE: The host variable needs to be quoted. To achieve this, we define it with two qoutes '"Name of the Variable"'. The other variables require no specially intention. 
+NOTE: The host variable needs to be quoted. To achieve this, we define it with two qoutes '"Name of the Variable"'. The other variables require no specific highlighting. 
 
 ```python
 class OF2Fmu(Fmi2Slave):
@@ -117,7 +117,7 @@ class OF2Fmu(Fmi2Slave):
 
 
 
-The last part in the generation of the FMU is a python file  specified after -f TempControl.py:
+The last part in the generation of the FMU is a python file specified after -f TempControl.py:
 ```python
 from pythonfmu.variables import Boolean
 from FMU4FOAM import Fmi2Causality, Fmi2Variability, Real, Boolean , Integer, String
@@ -158,15 +158,15 @@ class TempControl(OF2Fmu):
 
 ```
 
-The FMU standard defines for us three relevant causalities:
+The FMU standard defines three relevant causalities:
 
 - input -> input parameters that change in time (assume to be REAL aka floats)
-- output -> input parameters that change in time (assume to be REAL aka floats)
+- output -> output parameters that change in time (assume to be REAL aka floats)
 - parameter -> set at the start of the simulation and does not change (strings, float, interges, boolean)
 
-NOTE: FMI standard 2.0 only allows for scalar not fields so an OpenFOAM vector would be 3 input variables (This will change in 3.0)
+NOTE: FMI standard 2.0 only allows for scalar data transfer but does not support data fields so an OpenFOAM vector would be 3 input variables (This will change in FMI 3.0)
 
-In the exampled above we specify following causalities:
+In the example above we specify following causalities:
 
 - input:
     - Qin
@@ -183,7 +183,7 @@ In the exampled above we specify following causalities:
     - oscmd (from base class)
     - arguments (from base class)
 
-These parameters can be change before running the FMU for example with the [fmpy](https://github.com/CATIA-Systems/FMPy) by calling 
+These parameters can be modified before running the FMU for example with the [fmpy](https://github.com/CATIA-Systems/FMPy) by calling 
 
 ```
 python -m fmpy.gui TempControl.fmu
