@@ -292,6 +292,7 @@ void FOAMSlaveInstance::GetFMUstate(fmi2FMUstate& state)
 void FOAMSlaveInstance::SetFMUstate(const fmi2FMUstate& state)
 {
 
+}
 
 void FOAMSlaveInstance::FreeFMUstate(fmi2FMUstate& state)
 {

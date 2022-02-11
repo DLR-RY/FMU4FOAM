@@ -1,5 +1,6 @@
 #include <archive.h>
 #include <archive_entry.h>
+#include <filesystem>
 namespace fs = std::filesystem;
 
 static int copy_data(struct archive *ar, struct archive *aw)
