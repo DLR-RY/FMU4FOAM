@@ -30,7 +30,7 @@ The library requires OpenFOAM version v2012 or higher. OpenFOAM can be build fro
     sudo apt-get install -y libatlas-base-dev
 ```
 
-After the installation on WSl or Liunx the OpenFOAM, the enviroment needs to be set with
+After the installation on WSL or Liunx, the OpenFOAM enviroment needs to be set with
 
 ```bash
     source <installation path>/OpenFOAM-v2106/etc/bashrc
@@ -43,7 +43,7 @@ In order to avoid sourcing the enviroment with every new terminal session, the a
     alias of2012='source <installation path>/OpenFOAM-v2012/etc/bashrc'
 ```
 
-Another option is to define a alias in the bashrc. This way, multiple OpenFOAM version can be installed and switched easily by typing of2106 or of2012 in the terminal
+Another option is to define an alias in the bashrc. This way, multiple OpenFOAM version can be installed and switched easily by typing of2106 or of2012 in the terminal
 
 ##  How to install FMU4FOAM
 
@@ -70,7 +70,7 @@ cd example/TempControlFlange
 ./Allrun
 ```
 
-FMU4FOAM to quickly generate a library with testsuite and hosted documenation
+FMU4FOAM quickly generates a library with a testsuite and hosted documenation
 
 zip or clone this library and edit it from there
 
@@ -84,7 +84,7 @@ install oftest to automatically test OpenFOAM with py.test
 pip install oftest
 ```
 
-run the test enviroment
+run the test environment
 ```
 py.test
 ```
