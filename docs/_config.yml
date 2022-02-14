@@ -1,4 +1,4 @@
-repository: HenningScheufler/FMU4FOAM
+repository: DLR-RY/FMU4FOAM
 
 output: web
 # this property is useful for conditional filtering of content that is separate from the PDF.
@@ -12,10 +12,10 @@ site_title: FMI Coupling Interface for FOAM
 company_name: Copyright 2021 DLR
 # this appears in the footer
 
-github_editme_path: HenningScheufler/FMU4FOAM/blob/master/doc
+github_editme_path: DLR-RY/FMU4FOAM/blob/master/doc
 # if you're using Github, provide the basepath to the branch you've created for reviews, following the sample here. if not, leave this value blank.
 
-# gitlab_editme_path: HenningScheufler/FMU4FOAM/blob/master/doc
+# gitlab_editme_path: DLR-RY/FMU4FOAM/blob/master/doc
 # if you're using GitLab, provide the basepath to the branch you've created for reviews, following the sample here. if not, leave this value blank.
 
 google_analytics: UA-66296557-1
@@ -107,7 +107,7 @@ description: "Intended as a documentation theme based on Jekyll for technical wr
 # the description is used in the feed.xml file
 
 # needed for sitemap.xml file only
-# url: henningscheufler.github.io
+# url: dlr-ry.github.io
 # baseurl: /FMU4FOAM/docs
 
 
