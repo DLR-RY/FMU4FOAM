@@ -9,14 +9,14 @@ folder: doc
 This libray offers the opportunity to connect OpenFOAM with FMUs in two ways
 
 - generate an FMU from an OpenFOAM case
-- run FMUs from OpenFOAM 
+- run FMUs in OpenFOAM 
 
 
 
 
 ## run FMUs within an OpenFOAM solver
 
-One of the biggest feature of OpenFOAM is that is can be easily be extended by linking new library to the solver at runtime. One example are *functionObjects* that are loaded at runtime and have to be placed in the *system/controlDict* in the functions dictionary. To run FMUs in OpenFOAM, the *FMUSimulator* needs to be copied into the *controlDict*:
+One of the biggest feature of OpenFOAM is that it can be easily extended by linking new libraries to the solver at runtime. One example are *functionObjects* that are loaded at runtime and have to be placed in the *system/controlDict* in the functions dictionary. To run FMUs in OpenFOAM, the *FMUSimulator* needs to be copied into the *controlDict*:
 
 ```cpp
 
@@ -34,7 +34,7 @@ functions
 }
 ```
 
-With this entry, the OpenFOAM-solver loads the library *pyFMUSIM* - short for *libpyFMUSIM.so* - that specifies a new implementation of the functionObject *FMUSimulator*. Underthehood, *FMUSimulator* embeds a python interpreter that manages the FMUs. The embedded python interpreter simplifies the installation through *pip* or *conda* and the user can chose from multiple frameworks such as *pyfmi*, *fmpy* or *omsimulator*. Another huge advantage is that the user can connect multiple fmus in python and test them before connecting them to OpenFOAM. After sucessfully testing the FMU System, the *FMUSimulator* will call the class *pyClassName* in *pyFileName* that assumed to be located in the root of the OpenFOAM case. The class looks as followed:
+With this entry, the OpenFOAM-solver loads the library *pyFMUSIM* - short for *libpyFMUSIM.so* - that specifies a new implementation of the functionObject *FMUSimulator*. Under the hood *FMUSimulator* embeds a python interpreter that manages the FMUs. The embedded python interpreter simplifies the installation through *pip* or *conda* and the user can choose from multiple frameworks such as *pyfmi*, *fmpy* or *omsimulator*. Another huge advantage is that the user can connect multiple FMUs in python and test them before connecting them to OpenFOAM. After sucessfully testing the FMU System, the *FMUSimulator* will call the class *pyClassName* in *pyFileName* that is assumed to be located in the root of the OpenFOAM case. The class looks as follows:
 
 ```python
 import FMU4FOAM
@@ -80,7 +80,7 @@ class controlledTemperature(FMU4FOAM.FMUBase):
         self.oms.delete("model")
 ```
 
-It consists of a constructor that the initilzes the simulation, a destructor that finalizes the simulation and a method that advances the FMU system in time called stepUntil. The data transfer between OpenFOAM and the FMUs is handled by FMUBase with the method *from_OF* and *to_OF* and requires the definition of setVar and getVar:
+It consists of a constructor that initializes the simulation, a destructor that finalizes the simulation and a method that advances the FMU system in time called stepUntil. The data transfer between OpenFOAM and the FMUs is handled by FMUBase with the method *from_OF* and *to_OF* and requires the definition of setVar and getVar:
 
 
 ```python
@@ -109,7 +109,7 @@ It consists of a constructor that the initilzes the simulation, a destructor tha
         return str(json.dumps(d))
 ```
 
-It is possible to overload this function and replace it by custom solution that fits your needs but in most cases it should be sufficient to specify the FMU.json in the root of the OpenFOAM case:
+It is possible to overload this function and replace it by custom solutions that fit the user's needs but in most cases it should be sufficient to specify the FMU.json in the root of the OpenFOAM case:
 
 ```json
 {
@@ -122,10 +122,10 @@ It is possible to overload this function and replace it by custom solution that 
 }
 ```
 
-The FMU.json has to have 3 entries:
+The FMU.json has to have three entries:
 
 - mapping : List of all OpenFOAM variables ----> FMU variables
 - from_OF : List of the variables and its types computed by OpenFOAM
-- to_OF : List of the variables and its types computed by FMU
+- to_OF : List of the variables and its types computed by the FMU
 
-NOTE: from_OF and to_OF the OpenFOAM variables names need to be specified and the mapping assumes OF to FMU
+NOTE: from_OF and to_OF the OpenFOAM variable names need to be specified and the mapping assumes OF to FMU
