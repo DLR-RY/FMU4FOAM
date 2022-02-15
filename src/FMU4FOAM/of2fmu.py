@@ -27,7 +27,11 @@ FMI2_MODEL_OPTIONS: List[ModelOptions] = [
 
 
 class OF2Fmu(Fmi2Slave):
+    """Abstract class for the creation of FMU from an OpenFOAM case
 
+    Args:
+        Fmi2Slave: Abstract class defining FMU in details see pythomfmu
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -127,6 +131,13 @@ class OF2Fmu(Fmi2Slave):
         return root
 
     def __apply_start_value(self, var: ScalarVariable):
+        """apply start values
+
+        Args:
+            var (ScalarVariable): scalarVariable
+        Raises:
+            Exception: unsupported type
+        """        
         vrs = [var.value_reference]
 
         if isinstance(var, Integer):

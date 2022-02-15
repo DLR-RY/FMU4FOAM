@@ -2,7 +2,7 @@
             Copyright (c) 2021, German Aerospace Center (DLR)
 -------------------------------------------------------------------------------
 License
-    This file is part of the VoFLibrary source code library, which is an
+    This file is part of the FMU4FOAM source code library, which is an
 	unofficial extension to OpenFOAM.
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -87,14 +87,17 @@ class FMUController
 private:
 
     // Private data
+    //- zmq socket for network comms
     zmq_socket sock_;
 
+    //- time 
     const Time& time_;
 
+    //- next communication point
     scalar targetTime_; 
 
+    //- List of externalIOObject 
     externalIOObjectList extIOList_;
-
 
     // Private Member Functions
 

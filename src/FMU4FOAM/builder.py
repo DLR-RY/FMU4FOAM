@@ -26,6 +26,14 @@ logger = logging.getLogger(__name__)
 
 
 def get_class_name(file_name: Path) -> str:
+    """get class name from file path
+
+    Args:
+        file_name (Path): script file path 
+
+    Returns:
+        str: class name
+    """    
     with open(str(file_name), 'r') as file:
         data = file.read()
         return re.search(r'class (\w+)\(\s*OF2Fmu\s*\)\s*:', data).group(1)
@@ -61,8 +69,15 @@ def get_model_description(filepath: Path, module_name: str) -> Tuple[str, Elemen
     # Produce the xml
     return instance.modelName, instance.to_xml()
 
-def get_model_variables(model_xml):
-    
+def get_model_variables(model_xml: Element):
+    """get model variables from modelDescription.xml
+
+    Args:
+        model_xml (Element): xml describing the fmu
+
+    Returns:
+        [Element]: return model variable
+    """    
     var_xml = Element('modelParameters')
     var_xml = Element('ModelVariables')
 
@@ -239,10 +254,6 @@ class FmuBuilder:
                 zip_fmu.writestr(
                     "modelDescription.xml", xml_str.toprettyxml(encoding="UTF-8")
                 )
-
-                # write model vars to resources
-                # print(type(xml))
-                
 
                 var_xml = get_model_variables(xml)
                 var_xml_str = parseString(tostring(var_xml, "UTF-8"))

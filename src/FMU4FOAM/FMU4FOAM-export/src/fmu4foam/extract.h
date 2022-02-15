@@ -1,9 +1,11 @@
 #include <archive.h>
 #include <archive_entry.h>
+#include <filesystem>
 namespace fs = std::filesystem;
 
 static int copy_data(struct archive *ar, struct archive *aw)
 {
+    // copy archive
     int r;
     const void *buff;
     size_t size;
@@ -25,6 +27,7 @@ static int copy_data(struct archive *ar, struct archive *aw)
 
 static void extract(const char *filename,const char *outputDir)
 {
+    // unpack tarfile
     struct archive *a;
     struct archive *ext;
     struct archive_entry *entry;
@@ -46,6 +49,7 @@ static void extract(const char *filename,const char *outputDir)
     if ((r = archive_read_open_filename(a, filename, 10240)))
         exit(1);
     for (;;) {
+        // unpack all files
         r = archive_read_next_header(a, &entry);
         if (r == ARCHIVE_EOF)
         break;
@@ -53,10 +57,14 @@ static void extract(const char *filename,const char *outputDir)
         fprintf(stderr, "%s\n", archive_error_string(a));
         if (r < ARCHIVE_WARN)
         exit(1);
+
+        // set path for current file
         const char* currentFile = archive_entry_pathname(entry);
         auto fullOutputPath = fs::path(outputDir) / fs::path(currentFile);
         std::string s_outpath = fullOutputPath.u8string();
         archive_entry_set_pathname(entry, s_outpath.c_str());
+
+        // write files
         r = archive_write_header(ext, entry);
         if (r < ARCHIVE_OK)
         fprintf(stderr, "%s\n", archive_error_string(ext));
@@ -73,6 +81,7 @@ static void extract(const char *filename,const char *outputDir)
         if (r < ARCHIVE_WARN)
         exit(1);
     }
+    // cleanup
     archive_read_close(a);
     archive_read_free(a);
     archive_write_close(ext);

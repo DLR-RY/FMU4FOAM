@@ -3,12 +3,13 @@ from typing import Dict, Union
 import json
 
 class CouplingData:
+    """stores the coupling varaible and defines the mapping both ways
+    """    
 
     def __init__(self,json_file) -> None:
         with open(json_file) as file:
             d = json.load(file)
-        # maps from OF to FMU vice versa
-        
+        # maps from OF to FMU vice versa   
         self.OF_to_FMU: Dict[str,str] = {k:v for k,v in d["mapping"]} 
         self.FMU_to_OF: Dict[str,str] = {v:k for k,v in d["mapping"]}
 

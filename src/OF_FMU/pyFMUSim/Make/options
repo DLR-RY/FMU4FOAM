@@ -1,14 +1,17 @@
+PY_RPATH := -Wl,-rpath=/media/henning/ssd1linux/miniconda3/envs/omsim/lib
+
 
 EXE_INC = \
     -Wno-old-style-cast \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I../../../ECI4FOAM/src/externalComm/lnInclude \
-    -I../../../ECI4FOAM/src/embeddingPython/lnInclude
+    -I../../../ECI4FOAM/src/embeddingPython/lnInclude \
+    $(PY_RPATH)
 
 LIB_LIBS = \
-    -lfiniteVolume \
-    -lmeshTools \
     -L$(FOAM_USER_LIBBIN) \
+    -lembPython \
     -lexternalComm \
-    -lembPython
+    -lfiniteVolume \
+    -lmeshTools

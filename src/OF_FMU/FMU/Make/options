@@ -1,5 +1,6 @@
 
 EXE_INC = \
+    -I../pyFMUSim \
     -I../../../ECI4FOAM/src/externalComm/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/lnInclude \

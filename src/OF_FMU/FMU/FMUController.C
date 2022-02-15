@@ -2,7 +2,7 @@
             Copyright (c) 2021, German Aerospace Center (DLR)
 -------------------------------------------------------------------------------
 License
-    This file is part of the VoFLibrary source code library, which is an
+    This file is part of the FMU4FOAM source code library, which is an
 	unofficial extension to OpenFOAM.
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -84,7 +84,6 @@ Foam::functionObjects::FMUController::FMUController
     targetTime_(-GREAT),
     extIOList_(runTime)
 {
-    Pout << "Foam::functionObjects::FMUController::FMUController  " << endl;
     read(dict);
     commDataLayer& data = commDataLayer::New(time_);
     data.storeObj(scalar(0.0),"step_size",commDataLayer::causality::in);
@@ -108,14 +107,12 @@ Foam::functionObjects::FMUController::FMUController
         add_to_json<scalar>(jOutput,regOut);
         add_to_json<vector>(jOutput,regOut);
 
-        Info << "jOutput " << word(jOutput.dump()) << endl;
         sock_.write(word(jOutput.dump()));
         
         // receive
         auto& regIn = data.getRegistry(commDataLayer::causality::in);
 
         word recv = sock_.read();
-        Info << "recv json " << recv << endl;
         json input = json::parse(recv);
 
         // update input data
@@ -128,7 +125,6 @@ Foam::functionObjects::FMUController::FMUController
 
     sync_regObjects<scalar>(regIn);
     sync_regObjects<vector>(regIn);
-    Pout << "end constructor " << endl;
 }
 
 
@@ -144,50 +140,42 @@ bool Foam::functionObjects::FMUController::read(const dictionary& dict)
 
 bool Foam::functionObjects::FMUController::adjustTimeStep()
 {
-    // Info << "adjustTimeStep " << endl;
-    // Info << "time_.timeIndex() " << time_.timeIndex() << endl;
-    // commDataLayer& data = commDataLayer::New(time_);
-    // scalar currentTime = data.getObj<scalar>("current_time",commDataLayer::causality::in);
-    // scalar step_size = data.getObj<scalar>("step_size",commDataLayer::causality::in);
+    commDataLayer& data = commDataLayer::New(time_);
+    scalar currentTime = data.getObj<scalar>("current_time",commDataLayer::causality::in);
+    scalar step_size = data.getObj<scalar>("step_size",commDataLayer::causality::in);
 
-    // Info << "target time value " << targetTime_  << " currentTime: "  << time_.value() << endl;
-    // Info << "target currentTime value " << currentTime  << " step_size: "  << step_size << endl;
+    if (targetTime_ >= time_.value() + time_.deltaTValue())
+    {
+        return true;
+    }
 
-    // if (targetTime_ >= time_.value() + time_.deltaTValue())
-    // {
-    //     return true;
-    // }
+    // sync times
+    scalar newDeltaT = time_.deltaTValue();
+    if (time_.timeIndex() > 0)
+    {
+        if (newDeltaT > step_size)
+        {
+            newDeltaT = step_size;
+        }
+    }
 
-    // Info << "proceed currentTime value " << currentTime  << " step_size: "  << step_size << endl;
+    static label index = -1;
 
+    if (time_.timeIndex() != index)
+    {
+        // Store current time so we don't get infinite recursion (since
+        // setDeltaT calls adjustTimeStep() again)
+        index = time_.timeIndex();
 
-    //  // sync times
-    // scalar newDeltaT = time_.deltaTValue();
-    // if (time_.timeIndex() > 0)
-    // {
-    //     newDeltaT = currentTime + step_size - time_.value();
-    // }
-    // Info << "target time value " << currentTime + step_size  << " : "  << time_.value() + newDeltaT << endl;
-
-    // static label index = -1;
-
-    // if (time_.timeIndex() != index)
-    // {
-    //     // Store current time so we don't get infinite recursion (since
-    //     // setDeltaT calls adjustTimeStep() again)
-    //     index = time_.timeIndex();
-
-    //     // Set time, allow deltaT to be adjusted for writeInterval purposes
-    //     const_cast<Time&>(time_).setDeltaT(newDeltaT, false);
-    //     Info << "newDeltaT is " << newDeltaT << endl;
-    // }
+        // Set time, allow deltaT to be adjusted for writeInterval purposes
+        const_cast<Time&>(time_).setDeltaT(newDeltaT, true);
+    }
 
     return true;
 }
 
 bool Foam::functionObjects::FMUController::execute()
 {
-    Pout << "Foam::functionObjects::FMUController::execute() " << endl;
     auto& extFunc = extIOList_.functions();
     for(auto& f: extFunc)
     {
@@ -198,16 +186,12 @@ bool Foam::functionObjects::FMUController::execute()
 
     scalar currentTime = data.getObj<scalar>("current_time",commDataLayer::causality::in);
     scalar step_size = data.getObj<scalar>("step_size",commDataLayer::causality::in);
-    Info << "target time value " << targetTime_  << " currentTime: "  << time_.value() << " time_.deltaTValue() " << time_.deltaTValue() << endl;
-    Info << "target currentTime value " << currentTime  << " step_size: "  << step_size << endl;
-
     targetTime_ = currentTime + step_size;
     if (targetTime_ >= time_.value() + time_.deltaTValue())
     {
         return true;
     }
 
-    Info << "communicate data" << endl;
     if (Pstream::master())
     {
         // send
@@ -220,20 +204,23 @@ bool Foam::functionObjects::FMUController::execute()
         add_to_json<scalar>(jOutput,regOut);
         add_to_json<vector>(jOutput,regOut);
 
-        Info << "jOutput " << word(jOutput.dump()) << endl;
         sock_.write(word(jOutput.dump()));
         
         // receive
         auto& regIn = data.getRegistry(commDataLayer::causality::in);
 
         word recv = sock_.read();
-        Info << "recv json " << recv << endl;
         json input = json::parse(recv);
-
-        // update input data
-        get_from_json<scalar>(input,regIn);
-        get_from_json<vector>(input,regIn);
-
+        if (input.contains("terminate"))
+        {
+            time_.stopAt(Foam::Time::saWriteNow);
+        }
+        else
+        {
+            // update input data
+            get_from_json<scalar>(input,regIn);
+            get_from_json<vector>(input,regIn);
+        }
     }
 
     auto& regIn = data.getRegistry(commDataLayer::causality::in);
