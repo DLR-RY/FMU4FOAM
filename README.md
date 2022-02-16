@@ -3,7 +3,7 @@
 > A framework that enables the coupling of OpenFOAM with FMUs or the distribution of OpenFOAM as an FMU
 
 
-Accurate CFD simulations often require complex boundary conditions depending on numerous engineering disciplines. Currently, these boundary conditions would require the addition of new models to the open-source CFD framework OpenFOAM which is error-prone and time-consuming. FMI standard offers a container (FMUs) to exchange multi-physics models that can be used to simulate these multi-physics. This library provides the possibility of coupled FMUs with OpenFOAM or exporting OpenFOAM as an FMU.
+Accurate CFD simulations often require complex boundary conditions that may be depend on numerous other engineering disciplines. Currently, these boundary conditions would require the addition of new models to the open-source CFD framework OpenFOAM which is error-prone and time-consuming. FMI standard offers a container (FMUs) to exchange multi-physics models that can be used to simulate these multi-physics. This library provides the possibility of coupled FMUs with OpenFOAM or exporting OpenFOAM as an FMU.
 
 ### Documentation
 
