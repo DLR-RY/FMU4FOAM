@@ -19,7 +19,7 @@ authors:
 affiliations:
  - name: DLR Bremen, Institute for Space Systems
    index: 1
- - name: Norwegian University of Science and Technology
+ - name: Department of ICT and Natural Sciences, Norwegian University of Science and Technology, Norway
    index: 2
 date: 7 Feburary 2022
 bibliography: paper.bib
