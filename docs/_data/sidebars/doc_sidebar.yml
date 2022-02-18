@@ -3,7 +3,7 @@
 entries:
 - title: sidebar
   product: FMI Coupling Interface for FOAM
-  version: 0.1
+  version: 1.0
   folders:
 
   - title:
@@ -80,7 +80,7 @@ entries:
     output: web, pdf
     folderitems:
 
-    - title: 0.1 Release notes
+    - title: 1.0 Release notes
       url: /doc_release_notes_01.html
       output: web, pdf
 
