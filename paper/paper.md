@@ -11,7 +11,7 @@ authors:
     affiliation: "1"
     email: Henning.Scheufler@dlr.de
   - name: Lars Ivar Hatledal
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0001-6436-7213
     affiliation: "2"
   - name: Lukas Opp
     orcid: 0000-0000-0000-0000
@@ -19,7 +19,7 @@ authors:
 affiliations:
  - name: DLR Bremen, Institute for Space Systems
    index: 1
- - name: Norwegian University of Science and Technology
+ - name: Department of ICT and Natural Sciences, Norwegian University of Science and Technology, Norway
    index: 2
 date: 7 Feburary 2022
 bibliography: paper.bib
