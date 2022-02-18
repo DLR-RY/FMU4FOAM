@@ -10,7 +10,7 @@ folder: doc
 
 This example demonstrates the ability to pass boundary condition data using a pregenerated FMU into the OpenFoam environment using the FMU4FOAM extension. The FMU was generated using OpenModelica and is very similar to Modelica Standard Library's "ControlledTemperature" example from the HeatTransfer library shown in the following figure.
 
-{% include image.html file="TempControlFlange/original_schematic.png"  alt="Schematic of the ControlledTemperature example in OpenModelica" caption="Schematic of the ControlledTemperature example in OpenModelica" %}
+{% include image.html file="TempControlFlange/original_schematic.jpg"  alt="Schematic of the ControlledTemperature example in OpenModelica" caption="Schematic of the ControlledTemperature example in OpenModelica" %}
 
 In this FMU4FOAM example case, the FMU is used to control the temperature of a flange like geometry by imposing a heat flux boundary condition to the OpenFoam domain in order to heat up the flange. 
 
