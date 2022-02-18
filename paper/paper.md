@@ -7,7 +7,7 @@ tags:
   - coupled simulation
 authors:
   - name: Henning Scheufler^[corresponding author]
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0003-1578-9772
     affiliation: "1"
     email: Henning.Scheufler@dlr.de
   - name: Lars Ivar Hatledal
@@ -17,11 +17,11 @@ authors:
     orcid: 0000-0000-0000-0000
     affiliation: "1"
 affiliations:
- - name: DLR Bremen, Institute for Space Systems
+ - name: German Aerospace Center, Institute for Space Systems, Bremen
    index: 1
  - name: Department of ICT and Natural Sciences, Norwegian University of Science and Technology, Norway
    index: 2
-date: 7 Feburary 2022
+date: 18 Feburary 2022
 bibliography: paper.bib
 ---
 
