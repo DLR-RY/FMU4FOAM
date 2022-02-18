@@ -14,7 +14,7 @@ authors:
     orcid: 0000-0001-6436-7213
     affiliation: "2"
   - name: Lukas Opp
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-6791-4267
     affiliation: "1"
 affiliations:
  - name: German Aerospace Center, Institute for Space Systems, Bremen
