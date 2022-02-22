@@ -23,7 +23,7 @@ pip install oftest conan
 requires that OpenFOAM is build on that machine
 
 ```bash
-cd example/TempControlFlange
+cd examples/TempControlFlange
 ./Allrun
 ```
 
