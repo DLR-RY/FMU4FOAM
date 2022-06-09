@@ -87,6 +87,19 @@ Foam::functionObjects::FMUSimulator::FMUSimulator
     extIOList_(runTime)
 {
     read(dict);
+
+    // sync reginputs with other processors
+    commDataLayer& data = commDataLayer::New(time_);
+    auto& extFunc = extIOList_.functions();
+    for(auto& f: extFunc)
+    {
+        f.execute();
+    }
+
+    auto& regIn = data.getRegistry(commDataLayer::causality::in);
+
+    sync_regObjects<scalar>(regIn);
+    sync_regObjects<vector>(regIn);
 }
 
 
@@ -137,6 +150,11 @@ bool Foam::functionObjects::FMUSimulator::execute()
         get_from_json<vector>(input,regIn);
 
     }
+
+    auto& regIn = data.getRegistry(commDataLayer::causality::in);
+
+    sync_regObjects<scalar>(regIn);
+    sync_regObjects<vector>(regIn);
 
     return true;
 }
