@@ -190,7 +190,13 @@ jobs:
         pip install FMU4FOAM*.whl
         cd ..
         openfoam2106 -c "py.test -v --tb=auto"
-        
+
+    - name: upload logs
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: logs
+        path: logs
 
   build-and-test-wsl:
     needs: build-python
@@ -254,3 +260,10 @@ jobs:
         pip install FMU4FOAM*.whl
         cd ..
         openfoam2106 -c "py.test -v --tb=auto"
+
+    - name: upload logs
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: logs-windows
+        path: logs
