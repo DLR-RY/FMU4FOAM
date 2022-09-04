@@ -90,7 +90,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: [3.9] #[3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9, 3.10]
         # exclude:
         #   - os: ubuntu-20.04
         #     python-version: 3.7
@@ -115,7 +115,7 @@ jobs:
           conda activate test
           # Install test dependencies - update environment.yml if they changed
           conda env update --name=test --file=environment.yml
-          python -m pip install pyzmq pythonfmu
+          # python -m pip install pyzmq pythonfmu
           # install wheel
           cd python-wheel
           python -m pip install FMU4FOAM*.whl
