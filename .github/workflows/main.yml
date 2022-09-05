@@ -185,7 +185,7 @@ jobs:
         conda activate test
         # Install test dependencies - update environment.yml if they changed
         conda env update --name=test --file=environment.yml
-        pip install oftest OMSimulator pythonfmu
+        pip install -r requirements.txt
         cd python-wheel
         pip install FMU4FOAM*.whl
         cd ..
@@ -255,7 +255,7 @@ jobs:
       run: |
         export PATH="$HOME/miniconda/bin:$PATH"
         conda install -c conda-forge pyfmi
-        pip install oftest OMSimulator pythonfmu
+        pip install -r requirements.txt
         cd python-wheel
         pip install FMU4FOAM*.whl
         cd ..
