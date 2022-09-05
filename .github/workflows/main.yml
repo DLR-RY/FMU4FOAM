@@ -31,7 +31,7 @@ jobs:
           pip install conan
           cd $Env:github_workspace/src/FMU4FOAM/FMU4FOAM-export
           mkdir tmp-build
-          conan install . -s build_type=Release --install-folder=tmp-build
+          conan install . -s build_type=Release --install-folder=tmp-build --build=missing
           cd tmp-build
           cmake .. -DCMAKE_BUILD_TYPE=Release -A x64
           cmake --build . --config Release
@@ -89,8 +89,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: [3.9] #[3.7, 3.8, 3.9]
+        os: [ubuntu-latest, windows-2019]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
         # exclude:
         #   - os: ubuntu-20.04
         #     python-version: 3.7
@@ -115,7 +115,7 @@ jobs:
           conda activate test
           # Install test dependencies - update environment.yml if they changed
           conda env update --name=test --file=environment.yml
-          python -m pip install pyzmq pythonfmu
+          # python -m pip install pyzmq pythonfmu
           # install wheel
           cd python-wheel
           python -m pip install FMU4FOAM*.whl
@@ -185,12 +185,18 @@ jobs:
         conda activate test
         # Install test dependencies - update environment.yml if they changed
         conda env update --name=test --file=environment.yml
-        pip install oftest OMSimulator pythonfmu
+        pip install -r requirements.txt
         cd python-wheel
         pip install FMU4FOAM*.whl
         cd ..
         openfoam2106 -c "py.test -v --tb=auto"
-        
+
+    - name: upload logs
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: logs
+        path: logs
 
   build-and-test-wsl:
     needs: build-python
@@ -249,8 +255,15 @@ jobs:
       run: |
         export PATH="$HOME/miniconda/bin:$PATH"
         conda install -c conda-forge pyfmi
-        pip install oftest OMSimulator pythonfmu
+        pip install -r requirements.txt
         cd python-wheel
         pip install FMU4FOAM*.whl
         cd ..
         openfoam2106 -c "py.test -v --tb=auto"
+
+    - name: upload logs
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: logs-windows
+        path: logs

@@ -17,9 +17,9 @@ Assumes that the [OpenFOAM version 2012](https://www.openfoam.com/download/relea
 
 1. Install `FMU4FOAM` package:
 
-requires conan and pythonfmu
+requires conan
 ```bash
-pip install fmu4foam
+pip install conan
 ```
 ### Compile OpenFOAM
 
