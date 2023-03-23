@@ -12,7 +12,7 @@ summary: FMU4FOAM with testsuite and documenation
 ### Install library OpenFOAM
 
 ```bash
-pip install oftest conan
+pip install oftest conan==1.58.0
 ./build-ECI4FOAM.sh # init submodules
 ./Allwmake
 ```

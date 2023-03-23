@@ -49,7 +49,7 @@ Another option is to define an alias in the bashrc. This way, multiple OpenFOAM 
 
 Install OpenFoam
 ```bash
-pip install oftest conan
+pip install oftest conan==1.58.0
 ./build-ECI4FOAM.sh # init submodules
 ./Allwmake
 ```
@@ -66,6 +66,7 @@ pip install fmu4foam
 requires that OpenFOAM is build on that machine
 
 ```bash
+pip install OMSimulator 
 cd example/TempControlFlange
 ./Allrun
 ```
@@ -81,7 +82,7 @@ zip or clone this library and edit it from there
 install oftest to automatically test OpenFOAM with py.test
 
 ```
-pip install oftest
+pip install oftest OMSimulator 
 ```
 
 run the test environment

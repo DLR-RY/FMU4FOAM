@@ -28,7 +28,7 @@ jobs:
       - name: Compile wrapper on Windows
         if: startsWith(runner.os, 'Windows')
         run: |
-          pip install conan
+          pip install conan==1.58.0
           cd $Env:github_workspace/src/FMU4FOAM/FMU4FOAM-export
           mkdir tmp-build
           conan install . -s build_type=Release --install-folder=tmp-build --build=missing
@@ -40,7 +40,7 @@ jobs:
       - name: Compile wrapper on Linux / macOS
         if: startsWith(runner.os, 'Linux') || startsWith(runner.os, 'macOS')
         run: |
-          pip install conan
+          pip install conan==1.58.0
           cd $GITHUB_WORKSPACE/src/FMU4FOAM/FMU4FOAM-export
           mkdir tmp-build
           conan install . -s build_type=Release -s compiler.libcxx=libstdc++ --install-folder=tmp-build
@@ -168,7 +168,7 @@ jobs:
         conda activate test
         export WM_NCOMPPROCS=2
         python -m pip install --upgrade pip
-        pip install oftest conan
+        pip install oftest conan==1.58.0
         openfoam2106 -c ./build-ECI4FOAM.sh
 
         # compile OpenFOAM
@@ -239,7 +239,7 @@ jobs:
         export WM_NCOMPPROCS=2
 
         python -m pip install --upgrade pip
-        pip install oftest conan 
+        pip install oftest conan==1.58.0 
         openfoam2106 -c ./build-ECI4FOAM.sh
 
         # compile OpenFOAM

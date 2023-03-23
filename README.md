@@ -17,9 +17,9 @@ Assumes that the [OpenFOAM version 2012](https://www.openfoam.com/download/relea
 
 1. Install `FMU4FOAM` package:
 
-requires conan
+requires conan version 1
 ```bash
-pip install conan
+pip install conan==1.58.0
 ```
 ### Compile OpenFOAM
 
@@ -34,6 +34,7 @@ more details are found in the [documentation](https://DLR-RY.github.io/FMU4FOAM/
 
 
 ```bash
+ pip install OMSimulator 
 cd examples/TempControlFlange/
 ./Allrun
 ```
