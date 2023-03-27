@@ -12,7 +12,7 @@ site_title: FMI Coupling Interface for FOAM
 company_name: Copyright 2021 DLR
 # this appears in the footer
 
-github_editme_path: DLR-RY/FMU4FOAM/blob/master/doc
+github_editme_path: DLR-RY/FMU4FOAM/blob/master/docs/
 # if you're using Github, provide the basepath to the branch you've created for reviews, following the sample here. if not, leave this value blank.
 
 # gitlab_editme_path: DLR-RY/FMU4FOAM/blob/master/doc
