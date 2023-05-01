@@ -13,8 +13,8 @@ Accurate CFD simulations often require complex boundary conditions that may be d
 
 ### How to install?
 
-Assumes that the [OpenFOAM version 2012](https://www.openfoam.com/download/release-history) or higher and python v3.8+ is already installed
-
+Assumes that the [OpenFOAM version 2212](https://www.openfoam.com/download/release-history) or higher and python v3.8+ is already installed
+Note: Older version are supported on v1.0.1
 1. Install `FMU4FOAM` package:
 
 requires conan version 1
